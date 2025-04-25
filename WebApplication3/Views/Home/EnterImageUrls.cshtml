@@ -1,0 +1,185 @@
+﻿@model WebApplication3.Models.CarouselModel
+
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Enter Image URLs</h2>
+
+    <form asp-action="GenerateHtml" method="post" class="p-4 bg-light rounded shadow-sm">
+    @if (Model.NeedsSeminario)
+    {
+            <h3 class="text-primary">Σεμινάριο Images</h3>
+        for (int i = 0; i < Model.SeminarioImageCount; i++)
+        {
+                <div class="mb-4">
+                    <div class="mb-3">
+                    <label class="form-label">Image @i URL:</label>
+                        <input type="text" name="SeminarioImages[@i].Url" class="form-control" />
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="SeminarioImages[@i].KeepDefault" value="true" />
+                        <label class="form-check-label">Keep the previous image for this position?</label>
+                    </div>
+                    <div class="mb-3">
+                        @* If user checks "KeepDefault," they can pick which old image to use *@
+                        <label class="form-label">  Select from old images:</label>
+                        <select class="form-select" name="SeminarioImages[@i].OldImageSelection">
+                            <option value=""> -- None -- </option>
+                            @if (Model.OldSeminarioImages != null)
+                            {
+                                for (int oldIndex = 0; oldIndex < Model.OldSeminarioImages.Count; oldIndex++)
+                                {
+                                    var oldImg = Model.OldSeminarioImages[oldIndex];
+                                    <option value="@oldImg.ImageId">
+                                        @($"{oldImg.ImageId} - {oldImg.Url}")
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Image @i ID (optional):</label>
+                        <input class="form-control" type="text" name="SeminarioImages[@i].ImageId" />
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input"  type="checkbox" name="SeminarioImages[@i].IncludePostMessage" value="true" />
+                        <label class="form-check-label">Include postMessage logic for this image?</label>
+                    </div>
+            </div>
+            <hr />
+        }
+    }
+
+    @if (Model.NeedsEnergeiesTouMina)
+    {
+            <h3 class="text-primary">Ενέργειες του Μήνα Images</h3>
+        for (int i = 0; i < Model.EnergeiesTouMinaImageCount; i++)
+        {
+             <div class="mb-4">
+                    <div class="mb-3">
+                        <label class="form-label">Image @i URL:</label>
+                        <input class="form-control" type="text" name="EnergeiesImages[@i].Url" />
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" name="EnergeiesImages[@i].KeepDefault" value="true" />
+                        <label class="form-check-label">Keep the previous image for this position?</label>
+                    </div>
+                    <div class="mb-3">
+                        @* If user checks "KeepDefault," they can pick which old image to use *@
+                        <label class="form-label">Select from old images:</label>
+                        <select class="form-select"  name="EnergeiesImages[@i].OldImageSelection">
+                            <option value=""> -- None -- </option>
+                            @if (Model.OldEnergeiesImages != null)
+                            {
+                                for (int oldIndex = 0; oldIndex < Model.OldEnergeiesImages.Count; oldIndex++)
+                                {
+                                    var oldImg = Model.OldEnergeiesImages[oldIndex];
+                                    <option value="@oldImg.ImageId">
+                                        @($"{oldImg.ImageId} - {oldImg.Url}")
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Image @i ID (optional):</label>
+                        <input type="text" class="form-control" name="EnergeiesImages[@i].ImageId" />
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" name="EnergeiesImages[@i].IncludePostMessage" value="true" />
+                        <label class="form-check-label">Include postMessage logic for this image?</label>
+                    </div>
+            </div>
+            <hr />
+        }
+    }
+        @* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! *@
+
+
+    <!-- Preserve booleans and counts in hidden fields again -->
+    <input type="hidden" asp-for="NeedsSeminario" />
+    <input type="hidden" asp-for="NeedsEnergeiesTouMina" />
+    <input type="hidden" asp-for="NeedsProsforesExoplismou" />
+    <input type="hidden" asp-for="SeminarioImageCount" />
+    <input type="hidden" asp-for="EnergeiesTouMinaImageCount" />
+    <input type="hidden" asp-for="ProsforesExoplismouImageCount" />
+
+    @if (Model.OldSeminarioImages != null)
+    {
+        for (int i = 0; i < Model.OldSeminarioImages.Count; i++)
+        {
+            @* If you need to preserve them between posts, store them in hidden fields *@
+            <input type="hidden" name="OldSeminarioImages[@i].ImageId" value="@Model.OldSeminarioImages[i].ImageId" />
+            <input type="hidden" name="OldSeminarioImages[@i].Url" value="@Model.OldSeminarioImages[i].Url" />
+        }
+    }
+
+    @if (Model.OldEnergeiesImages != null)
+    {
+        for (int i = 0; i < Model.OldEnergeiesImages.Count; i++)
+        {
+            @* If you need to preserve them between posts, store them in hidden fields *@
+            <input type="hidden" name="OldEnergeiesImages[@i].ImageId" value="@Model.OldEnergeiesImages[i].ImageId" />
+            <input type="hidden" name="OldEnergeiesImages[@i].Url" value="@Model.OldEnergeiesImages[i].Url" />
+        }
+    }
+
+    @if (Model.OldProsforesImages != null)
+    {
+        for (int i = 0; i < Model.OldProsforesImages.Count; i++)
+        {
+            @* If you need to preserve them between posts, store them in hidden fields *@
+            <input type="hidden" name="OldProsforesImages[@i].ImageId" value="@Model.OldProsforesImages[i].ImageId" />
+            <input type="hidden" name="OldProsforesImages[@i].Url" value="@Model.OldProsforesImages[i].Url" />
+        }
+    }
+
+    
+
+    @if (Model.NeedsProsforesExoplismou)
+    {
+            <h3 class="text-primary">Προσφορές Εξοπλισμού Συνεργείου</h3>
+        for (int i = 0; i < Model.ProsforesExoplismouImageCount; i++)
+        {
+            <div class="mb-4">
+                    <div class="mb-3">
+                        <label class="form-label">Image @i URL:</label>
+                        <input class="form-control"  type="text" name="ProsforesImages[@i].Url" />
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="ProsforesImages[@i].KeepDefault" value="true" />
+                        <label class="form-check-label">Keep the previous image for this position?</label>
+                    </div>
+                    <div class="mb-3">
+                        @* If user checks "KeepDefault," they can pick which old image to use *@
+                        <label class="form-label">Select from old images:</label>
+                        <select class="form-select" name="ProsforesImages[@i].OldImageSelection">
+                            <option value=""> -- None -- </option>
+                            @if (Model.OldProsforesImages != null)
+                            {
+                                for (int oldIndex = 0; oldIndex < Model.OldProsforesImages.Count; oldIndex++)
+                                {
+                                    var oldImg = Model.OldProsforesImages[oldIndex];
+                                    <option value="@oldImg.ImageId">
+                                        @($"{oldImg.ImageId} - {oldImg.Url}")
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Image @i ID (optional):</label>
+                        <input class="form-control" type="text" name="ProsforesImages[@i].ImageId" />
+                    </div>
+                    <div class="form-check">
+
+                        <input class="form-check-input" type="checkbox" name="ProsforesImages[@i].IncludePostMessage" value="true" />
+                        <label class="form-check-label">Include postMessage logic for this image?</label>
+                    </div>
+            </div>
+        }
+    }
+        <div class="d-flex justify-content-center mt-4">
+            <button type="submit" class="btn btn-primary px-5">Generate HTML</button>
+        </div>
+</form>
+</div>

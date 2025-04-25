@@ -1,0 +1,580 @@
+﻿@model WebApplication3.Models.CarouselModel
+
+@{
+    ViewData["Title"] = "Landing Page Manager";
+}
+
+<style>
+    /* Simple, reliable styling */
+    .main-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .section-card {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+    
+    .section-header {
+        background-color: #f5f5f5;
+        padding: 12px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .section-title {
+        margin: 0;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+    }
+    
+    .section-content {
+        padding: 15px;
+    }
+    
+    .image-cards {
+        margin-bottom: 15px;
+    }
+    
+    .image-card {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 15px;
+        margin-bottom: 15px;
+        position: relative;
+    }
+    
+    .image-card-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+    
+    .image-preview {
+        background-color: #eee;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 10px;
+        height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 10px;
+    }
+    
+    .image-preview img {
+        max-height: 130px;
+        max-width: 100%;
+    }
+    
+    .delete-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #f8d7da;
+        color: #dc3545;
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+    
+    .add-image-btn {
+        margin-top: 20px;
+    }
+    
+    /* Preview Panel Styles */
+    .preview-panel {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-top: 30px;
+        margin-bottom: 30px;
+        overflow: hidden;
+    }
+    
+    .preview-header {
+        background-color: #f5f5f5;
+        padding: 12px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .preview-title {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+    
+    .preview-container {
+        padding: 0;
+        height: 500px;
+        overflow: auto;
+        border: none;
+    }
+    
+    .preview-controls {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .preview-container iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+    
+    /* Layout Options */
+    .two-column-layout {
+        display: flex;
+        gap: 20px;
+    }
+    
+    .left-column {
+        flex: 1;
+    }
+    
+    .right-column {
+        width: 40%;
+    }
+  
+</style>
+
+<div class="main-container">
+    <h1 class="mb-4">Landing Page Manager</h1>
+    
+    <div class="two-column-layout">
+        <div class="left-column">
+            <form asp-action="ProcessImproved" method="post" id="carouselForm">
+                <!-- Seminario Section -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title" onclick="toggleSection(this)">
+                            <i class="fas fa-chevron-down"></i>
+                            Σεμινάριο (Seminario)
+                        </h2>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" asp-for="NeedsSeminario" id="seminarioToggle" onchange="updatePreview()">
+                            <label class="form-check-label" for="seminarioToggle">Active</label>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <div class="image-cards" id="seminarioCards">
+                            @if (Model.SeminarioImages != null)
+                            {
+                                @for (int i = 0; i < Model.SeminarioImages.Count; i++)
+                                {
+                                    <div class="image-card">
+                                        <button type="button" class="delete-btn" onclick="removeCard(this)">×</button>
+                                        <h5>Image @(i+1)</h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Image URL:</label>
+                                                    <input type="text" class="form-control url-input" 
+                                                           name="SeminarioImages[@i].Url" 
+                                                           value="@Model.SeminarioImages[i].Url"
+                                                           onchange="updatePreview(this)">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Image ID:</label>
+                                                    <input type="text" class="form-control" 
+                                                           name="SeminarioImages[@i].ImageId" 
+                                                           value="@Model.SeminarioImages[i].ImageId"
+                                                           placeholder="castrol, isse, etc"
+                                                           onchange="updatePreview()">
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" 
+                                                           name="SeminarioImages[@i].IncludePostMessage" 
+                                                           value="true" 
+                                                           @(Model.SeminarioImages[i].IncludePostMessage ? "checked" : "")
+                                                           onchange="updatePreview()">
+                                                    <label class="form-check-label">Enable click tracking</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="image-preview">
+                                                    <img src="@Model.SeminarioImages[i].Url" 
+                                                         onerror="this.style.display='none'" 
+                                                         onload="this.style.display='block'">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <button type="button" class="btn btn-primary add-image-btn" 
+                                onclick="addImageCard('seminarioCards', 'SeminarioImages')">
+                            <i class="fas fa-plus"></i> Add Image
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Energeies Section -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title" onclick="toggleSection(this)">
+                            <i class="fas fa-chevron-down"></i>
+                            Ενέργειες του Μήνα (Monthly Actions)
+                        </h2>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" asp-for="NeedsEnergeiesTouMina" id="energeiesToggle" onchange="updatePreview()">
+                            <label class="form-check-label" for="energeiesToggle">Active</label>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <div class="image-cards" id="energeiesCards">
+                            @if (Model.EnergeiesImages != null)
+                            {
+                                @for (int i = 0; i < Model.EnergeiesImages.Count; i++)
+                                {
+                                    <div class="image-card">
+                                        <button type="button" class="delete-btn" onclick="removeCard(this)">×</button>
+                                        <h5>Image @(i+1)</h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Image URL:</label>
+                                                    <input type="text" class="form-control url-input" 
+                                                           name="EnergeiesImages[@i].Url" 
+                                                           value="@Model.EnergeiesImages[i].Url"
+                                                           onchange="updatePreview(this)">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Image ID:</label>
+                                                    <input type="text" class="form-control" 
+                                                           name="EnergeiesImages[@i].ImageId" 
+                                                           value="@Model.EnergeiesImages[i].ImageId"
+                                                           placeholder="castrol, isse, etc"
+                                                           onchange="updatePreview()">
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" 
+                                                           name="EnergeiesImages[@i].IncludePostMessage" 
+                                                           value="true" 
+                                                           @(Model.EnergeiesImages[i].IncludePostMessage ? "checked" : "")
+                                                           onchange="updatePreview()">
+                                                    <label class="form-check-label">Enable click tracking</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="image-preview">
+                                                    <img src="@Model.EnergeiesImages[i].Url" 
+                                                         onerror="this.style.display='none'" 
+                                                         onload="this.style.display='block'">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <button type="button" class="btn btn-primary add-image-btn" 
+                                onclick="addImageCard('energeiesCards', 'EnergeiesImages')">
+                            <i class="fas fa-plus"></i> Add Image
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Prosfores Section -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title" onclick="toggleSection(this)">
+                            <i class="fas fa-chevron-down"></i>
+                            Προσφορές Εξοπλισμού (Equipment Offers)
+                        </h2>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" asp-for="NeedsProsforesExoplismou" id="prosforesToggle" onchange="updatePreview()">
+                            <label class="form-check-label" for="prosforesToggle">Active</label>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <div class="image-cards" id="prosforesCards">
+                            @if (Model.ProsforesImages != null)
+                            {
+                                @for (int i = 0; i < Model.ProsforesImages.Count; i++)
+                                {
+                                    <div class="image-card">
+                                        <button type="button" class="delete-btn" onclick="removeCard(this)">×</button>
+                                        <h5>Image @(i+1)</h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Image URL:</label>
+                                                    <input type="text" class="form-control url-input" 
+                                                           name="ProsforesImages[@i].Url" 
+                                                           value="@Model.ProsforesImages[i].Url"
+                                                           onchange="updatePreview(this)">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Image ID:</label>
+                                                    <input type="text" class="form-control" 
+                                                           name="ProsforesImages[@i].ImageId" 
+                                                           value="@Model.ProsforesImages[i].ImageId"
+                                                           placeholder="castrol, isse, etc"
+                                                           onchange="updatePreview()">
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" 
+                                                           name="ProsforesImages[@i].IncludePostMessage" 
+                                                           value="true" 
+                                                           @(Model.ProsforesImages[i].IncludePostMessage ? "checked" : "")
+                                                           onchange="updatePreview()">
+                                                    <label class="form-check-label">Enable click tracking</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="image-preview">
+                                                    <img src="@Model.ProsforesImages[i].Url" 
+                                                         onerror="this.style.display='none'" 
+                                                         onload="this.style.display='block'">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <button type="button" class="btn btn-primary add-image-btn" 
+                                onclick="addImageCard('prosforesCards', 'ProsforesImages')">
+                            <i class="fas fa-plus"></i> Add Image
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4 mb-5">
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fas fa-save"></i> Save & Generate HTML
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+<script>
+    // Image counter for each section
+    let counters = {
+        seminarioCards: @(Model.SeminarioImages?.Count ?? 0),
+        energeiesCards: @(Model.EnergeiesImages?.Count ?? 0),
+        prosforesCards: @(Model.ProsforesImages?.Count ?? 0)
+    };
+    
+    // Add a new image card
+    function addImageCard(containerId, namePrefix) {
+        const container = document.getElementById(containerId);
+        const index = counters[containerId];
+        
+        // Create the card
+        const card = document.createElement('div');
+        card.className = 'image-card';
+        card.innerHTML = `
+            <button type="button" class="delete-btn" onclick="removeCard(this)">×</button>
+            <h5>Image ${index + 1}</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Image URL:</label>
+                        <input type="text" class="form-control url-input" 
+                               name="${namePrefix}[${index}].Url" 
+                               onchange="updatePreview(this)">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Image ID:</label>
+                        <input type="text" class="form-control" 
+                               name="${namePrefix}[${index}].ImageId" 
+                               placeholder="castrol, isse, etc"
+                               onchange="updatePreview()">
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" 
+                               name="${namePrefix}[${index}].IncludePostMessage" 
+                               value="true"
+                               onchange="updatePreview()">
+                        <label class="form-check-label">Enable click tracking</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="image-preview">
+                        <img style="display: none;">
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Add to container
+        container.appendChild(card);
+        
+        // Increment counter
+        counters[containerId]++;
+        
+        // Update preview
+        updatePreview();
+    }
+    
+    // Remove a card
+    function removeCard(button) {
+        const card = button.closest('.image-card');
+        const container = card.parentElement;
+        container.removeChild(card);
+        
+        // Update indices for remaining cards
+        const containerId = container.id;
+        const namePrefix = getNamePrefix(containerId);
+        const cards = container.querySelectorAll('.image-card');
+        
+        cards.forEach((card, index) => {
+            // Update title
+            card.querySelector('h5').textContent = `Image ${index + 1}`;
+            
+            // Update input names
+            card.querySelectorAll('input').forEach(input => {
+                const name = input.getAttribute('name');
+                if (name) {
+                    const newName = name.replace(/\[\d+\]/, `[${index}]`);
+                    input.setAttribute('name', newName);
+                }
+            });
+        });
+        
+        // Update counter
+        counters[containerId] = cards.length;
+        
+        // Update preview
+        updatePreview();
+    }
+    
+    // Get name prefix from container ID
+    function getNamePrefix(containerId) {
+        switch (containerId) {
+            case 'seminarioCards': return 'SeminarioImages';
+            case 'energeiesCards': return 'EnergeiesImages';
+            case 'prosforesCards': return 'ProsforesImages';
+            default: return '';
+        }
+    }
+    
+    // Update image preview
+    function updatePreview(input) {
+        // Update individual image preview if input is provided
+        if (input) {
+            const card = input.closest('.image-card');
+            const img = card.querySelector('.image-preview img');
+            
+            const url = input.value.trim();
+            if (url) {
+                img.src = url;
+                img.style.display = 'none'; // Hide until loaded
+                
+                img.onload = function() {
+                    img.style.display = 'block';
+                };
+                
+                img.onerror = function() {
+                    img.style.display = 'none';
+                };
+            } else {
+                img.style.display = 'none';
+            }
+        }
+        
+        // Update the full page preview
+        const formData = new FormData(document.getElementById('carouselForm'));
+        
+        fetch('/Carousel/GeneratePreview', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.text())
+        .then(html => {
+            const iframe = document.getElementById('previewFrame');
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            iframeDoc.open();
+            iframeDoc.write(html);
+            iframeDoc.close();
+        })
+        .catch(error => {
+            console.error('Error generating preview:', error);
+        });
+    }
+    
+    // Manually refresh the preview
+    function refreshPreview() {
+        updatePreview();
+    }
+    
+    // Change preview size
+    function changePreviewSize(size) {
+        const container = document.getElementById('previewContainerWrapper');
+        
+        // Remove existing size classes
+        container.classList.remove('desktop-view', 'tablet-view', 'mobile-view');
+        
+        // Add new size class
+        container.classList.add(`${size}-view`);
+    }
+    
+    // Toggle section visibility
+    function toggleSection(titleElement) {
+        const section = titleElement.closest('.section-card');
+        const content = section.querySelector('.section-content');
+        const icon = titleElement.querySelector('i');
+        
+        if (content.style.display === 'none') {
+            content.style.display = 'block';
+            icon.classList.remove('fa-chevron-right');
+            icon.classList.add('fa-chevron-down');
+        } else {
+            content.style.display = 'none';
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-right');
+        }
+    }
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize all URL inputs
+        document.querySelectorAll('.url-input').forEach(input => {
+            const card = input.closest('.image-card');
+            const img = card.querySelector('.image-preview img');
+            
+            const url = input.value.trim();
+            if (url) {
+                img.src = url;
+                img.style.display = 'none'; // Hide until loaded
+                
+                img.onload = function() {
+                    img.style.display = 'block';
+                };
+                
+                img.onerror = function() {
+                    img.style.display = 'none';
+                };
+            } else {
+                img.style.display = 'none';
+            }
+        });
+        
+        // Initialize full preview
+        updatePreview();
+    });
+</script>

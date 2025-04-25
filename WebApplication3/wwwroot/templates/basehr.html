@@ -1,0 +1,91 @@
+<div class="horizontal-menu" style="display: flex; justify-content: space-around; padding: 20px 0;"><span> <a href="https://www.iaponiki.gr/hr/orama/" style="color: #ff0000; font-size: 18px; font-weight: bold; text-decoration: none; padding: 10px 20px; border-radius: 8px; transition: background-color 0.3s ease, color 0.3s ease; background-color: transparent;" onmouseover="this.style.backgroundColor='#d3d3d3';" onmouseout="this.style.backgroundColor='transparent';"> Όραμα και Αξίες</a> <a href="/hr/anoixtes-theseis" style="color: #ff0000; font-size: 18px; font-weight: bold; text-decoration: none; padding: 10px 20px; border-radius: 8px; transition: background-color 0.3s ease, color 0.3s ease; background-color: transparent;" onmouseover="this.style.backgroundColor='#d3d3d3';" onmouseout="this.style.backgroundColor='transparent';"> Ανοιχτές Θέσεις</a> <a href="/hr/eukairies-karieras" style="color: #ff0000; font-size: 18px; font-weight: bold; text-decoration: none; padding: 10px 20px; border-radius: 8px; transition: background-color 0.3s ease, color 0.3s ease; background-color: transparent;" onmouseover="this.style.backgroundColor='#d3d3d3';" onmouseout="this.style.backgroundColor='transparent';"> Ευκαιρίες Καριέρας</a> </span></div>
+<!-- JavaScript for Responsiveness -->
+<script>
+    // <![CDATA[
+    function adjustMenu() {
+        const menu = document.querySelector('.horizontal-menu');
+        const links = document.querySelectorAll('.horizontal-menu a');
+
+        if (window.innerWidth <= 768) {
+            menu.style.flexDirection = 'column';
+            menu.style.padding = '20px';
+            menu.style.textAlign = 'center';
+
+            links.forEach(link => {
+                link.style.padding = '10px 10px';
+            });
+        } else {
+            menu.style.flexDirection = 'row';
+            menu.style.padding = '20px 5px';
+            menu.style.textAlign = 'initial';
+
+            links.forEach(link => {
+                link.style.padding = '10px 10px';
+            });
+        }
+    }
+
+    // Run on load
+    window.onload = adjustMenu;
+
+    // Run on window resize
+    window.onresize = adjustMenu;
+    // ]]></script>
+<p>Η ΙΑΠΩΝΙΚΗ Α.Ε., ηγέτιδα εταιρεία στην αγορά του Aftermarket στην Ελλάδα, με πανελλαδικό δίκτυο καταστημάτων και με διεθνείς συνεργασίες αναζητά:</p>
+<!--BEGIN_JOB_POSTINGS-->
+<!--JOB_POSTINGS_PLACEHOLDER-->
+<!--END_JOB_POSTINGS-->
+<script>
+    // <![CDATA[
+    // Select all links with the class "submitLink"
+    const links = document.querySelectorAll('.submitLink');
+
+    // Loop through each link and add event listeners for hover effect
+    links.forEach(link => {
+        link.addEventListener('mouseover', () => {
+            link.style.backgroundColor = '#FFFFFF'; // White background
+            link.style.color = '#FF0000'; // Red text
+        });
+
+        link.addEventListener('mouseout', () => {
+            link.style.backgroundColor = '#FF0000'; // Red background
+            link.style.color = '#FFFFFF'; // White text
+        });
+    });
+    // ]]></script>
+<!-- JavaScript για εναλλαγή προβολής -->
+<script>
+    // <![CDATA[
+    function toggleDetails(jobId) {
+        const details = document.getElementById(jobId);
+        const summary = details.previousElementSibling;
+        const allDetails = document.querySelectorAll('.job-details');
+        const allSummaries = document.querySelectorAll('.job-summary');
+
+        // Reset all other job summaries and details
+        allDetails.forEach((detail) => {
+            if (detail.id !== jobId) {
+                detail.style.display = 'none';
+                detail.previousElementSibling.style.boxShadow = '0px 4px 8px rgba(0, 0, 0, 0.2)';
+                detail.previousElementSibling.style.backgroundColor = '#cbcbcb'; // Reset background color
+            }
+        });
+
+        allSummaries.forEach((summary) => {
+            summary.querySelector('.expand-icon').textContent = '+';
+        });
+
+        // Toggle the selected job details and summary styles
+        if (details.style.display === 'none' || details.style.display === '') {
+            details.style.display = 'block';
+            summary.style.boxShadow = '0px 4px 8px rgba(0, 0, 0, 0.4)'; // Grey shadow when minimized
+            summary.querySelector('.expand-icon').textContent = '−';
+            summary.style.backgroundColor = '#98989f'; // New color for selected job post
+        } else {
+            details.style.display = 'none';
+            summary.style.boxShadow = '0px 4px 8px rgba(0, 0, 0, 0.2)'; // Grey shadow when minimized
+            summary.querySelector('.expand-icon').textContent = '+';
+            summary.style.backgroundColor = '#cbcbcb'; // Reset color when collapsed
+        }
+    }
+    // ]]></script>

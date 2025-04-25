@@ -1,0 +1,47 @@
+{
+  "NeedsSeminario": true,
+  "NeedsEnergeiesTouMina": true,
+  "NeedsProsforesExoplismou": false,
+  "SeminarioImageCount": 2,
+  "EnergeiesTouMinaImageCount": 1,
+  "ProsforesExoplismouImageCount": 0,
+  "SeminarioImages": [
+    {
+      "ImageId": "GATES",
+      "Url": "https://www.iaponiki.gr/files/catalogue/734x400_GATES_0425.jpg",
+      "KeepDefault": false,
+      "Query": null,
+      "EventLabel": null,
+      "CustomerId": null,
+      "OldImageSelection": null,
+      "IncludePostMessage": true
+    },
+    {
+      "ImageId": "PURFLUX",
+      "Url": "https://www.iaponiki.gr/files/catalogue/734x400_PURFLUX_0425.jpg",
+      "KeepDefault": false,
+      "Query": null,
+      "EventLabel": null,
+      "CustomerId": null,
+      "OldImageSelection": null,
+      "IncludePostMessage": true
+    }
+  ],
+  "EnergeiesImages": [
+    {
+      "ImageId": "734x400purflux0425",
+      "Url": "https://www.iaponiki.gr/files/catalogue/734x400_PURFLUX_0425.jpg",
+      "KeepDefault": false,
+      "Query": null,
+      "EventLabel": null,
+      "CustomerId": null,
+      "OldImageSelection": null,
+      "IncludePostMessage": false
+    }
+  ],
+  "ProsforesImages": [],
+  "OldSeminarioImages": null,
+  "OldEnergeiesImages": null,
+  "OldProsforesImages": null,
+  "CustomerId": null
+}

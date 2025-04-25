@@ -1,0 +1,39 @@
+﻿@model WebApplication3.Models.CarouselModel
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">How Many Images For Each Carousel?</h2>
+    <form asp-action="EnterImageUrls" method="post" class="p-4 bg-light rounded shadow-sm">
+        @if (Model.NeedsSeminario)
+        {
+            <div class="mb-4">
+                <label asp-for="SeminarioImageCount" class="form-label">Σεμινάριο:</label>
+                <input type="number" class="form-control" asp-for="SeminarioImageCount" min="0" />
+            </div>
+        }
+
+        @if (Model.NeedsEnergeiesTouMina)
+        {
+            <div class="mb-4">
+                <label asp-for="EnergeiesTouMinaImageCount" class="form-label">Ενέργειες του Μήνα:</label>
+                <input type="number" class="form-control" asp-for="EnergeiesTouMinaImageCount" min="0" />
+            </div>
+        }
+
+        @if (Model.NeedsProsforesExoplismou)
+        {
+            <div class="mb-4">
+                <label asp-for="ProsforesExoplismouImageCount" class="form-label">Προσφορές Εξοπλισμού Συνεργείου:</label>
+                <input type="number" class="form-control" asp-for="ProsforesExoplismouImageCount" min="0" />
+            </div>
+        }
+
+        <!-- CRITICAL: Preserve the booleans in hidden fields -->
+        <input type="hidden" asp-for="NeedsSeminario" />
+        <input type="hidden" asp-for="NeedsEnergeiesTouMina" />
+        <input type="hidden" asp-for="NeedsProsforesExoplismou" />
+
+        <div class="d-flex justify-content-center mt-4">
+            <button type="submit" class="btn btn-primary px-5">Next</button>
+        </div>
+    </form>
+</div>

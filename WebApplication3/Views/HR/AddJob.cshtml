@@ -1,0 +1,141 @@
+﻿@model WebApplication3.Models.HRModel.JobPosting
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0 fs-4"><i class="fas fa-plus-circle me-2"></i>Add New Job</h2>
+        </div>
+        <div class="card-body">
+            <form asp-action="AddJob" method="post">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Title" class="form-label fw-bold">Title</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                            <input type="text" asp-for="Title" class="form-control" required placeholder="Enter job title" />
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Category" class="form-label fw-bold">Category</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-folder"></i></span>
+                            <select asp-for="Category" class="form-select">
+                                <option value="">Select a category</option>
+                                <option value="Development">Development</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Management">Management</option>
+                                <option value="Sales">Sales</option>
+                                <option value="Support">Support</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-mb-3">
+                    <label asp-for="Location" class="form-label fw-bold">Location</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                        <input type="text" asp-for="Location" class="form-control" placeholder="Enter job location" />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Summary" class="form-label fw-bold">Summary</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-align-left"></i></span>
+                        <textarea asp-for="Summary" class="form-control" rows="2" required placeholder="Brief summary of the position"></textarea>
+                    </div>
+                    <div class="form-text">A short description that will appear in job listings</div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Details" class="form-label fw-bold">Details</label>
+                    <textarea asp-for="Details" class="form-control" rows="6" required placeholder="Detailed job description, requirements, benefits, etc."></textarea>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="ApplyLink" class="form-label fw-bold">Apply Link</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-link"></i></span>
+                            <input type="url" asp-for="ApplyLink" class="form-control" required placeholder="https://..." />
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="OrderId" class="form-label fw-bold">Display Order</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-sort-numeric-down"></i></span>
+                            <input type="number" asp-for="OrderId" class="form-control" min="0" placeholder="0" />
+                        </div>
+                        <div class="form-text">Lower numbers appear first</div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-bold">Status</label>
+                        <div class="form-control bg-light">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" asp-for="IsActive" checked />
+                                <label class="form-check-label" asp-for="IsActive">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="PostingDate" class="form-label fw-bold">Posting Date</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-calendar-plus"></i></span>
+                            <input type="date" asp-for="PostingDate" class="form-control" required />
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="ExpiryDate" class="form-label fw-bold">Expiry Date</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-calendar-times"></i></span>
+                            <input type="date" asp-for="ExpiryDate" class="form-control" required />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between border-top pt-3 mt-3">
+                    <a asp-action="ManageJobs" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Save Job
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Set default dates if they're not already set
+            if (!document.querySelector('input[asp-for="PostingDate"]').value) {
+                document.querySelector('input[asp-for="PostingDate"]').value = new Date().toISOString().substring(0, 10);
+            }
+
+            if (!document.querySelector('input[asp-for="ExpiryDate"]').value) {
+                // Default expiry to 30 days from now
+                const expiryDate = new Date();
+                expiryDate.setDate(expiryDate.getDate() + 30);
+                document.querySelector('input[asp-for="ExpiryDate"]').value = expiryDate.toISOString().substring(0, 10);
+            }
+
+            // Simple validation to ensure expiry date is after posting date
+            document.querySelector('form').addEventListener('submit', function(e) {
+                const postingDate = new Date(document.querySelector('input[asp-for="PostingDate"]').value);
+                const expiryDate = new Date(document.querySelector('input[asp-for="ExpiryDate"]').value);
+
+                if (expiryDate <= postingDate) {
+                    e.preventDefault();
+                    alert('Expiry date must be after posting date');
+                }
+            });
+        });
+    </script>
+}

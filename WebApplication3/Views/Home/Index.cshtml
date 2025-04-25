@@ -1,0 +1,457 @@
+﻿@{
+    ViewData["Title"] = "Welcome";
+}
+
+<div class="welcome-dashboard">
+    <!-- Welcome Header Section -->
+    <div class="welcome-header">
+        <h1 class="display-4">Welcome to the Admin Panel</h1>
+        <p class="lead">Manage your business operations efficiently in one place</p>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <div class="user-greeting">
+                <i class="fas fa-user-circle"></i> Hello, <strong>@User.Identity.Name</strong>!
+            </div>
+        }
+        else
+        {
+            <div class="user-greeting">
+                <i class="fas fa-exclamation-triangle"></i> You are not logged in. Some features may be restricted.
+            </div>
+        }
+    </div>
+
+    <!-- Quick Stats Overview -->
+    <div class="stats-overview">
+        <div class="stat-card jobs">
+            <div class="stat-icon">
+                <i class="fas fa-briefcase"></i>
+            </div>
+            <div class="stat-content">
+                <h3>HR Management</h3>
+                <p class="stat-number">@ViewBag.ActiveJobs Active Jobs</p>
+                <p class="stat-description">Manage job postings and HR content</p>
+            </div>
+            <a href="@Url.Action("ManageJobs", "HR")" class="stat-link">
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="stat-card invoices">
+            <div class="stat-icon">
+                <i class="fas fa-file-invoice-dollar"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Invoice Management</h3>
+                <p class="stat-number">@ViewBag.PendingInvoices Pending Invoices</p>
+                <p class="stat-description">Compare and reconcile invoices</p>
+            </div>
+            <a href="@Url.Action("Dashboard", "Invoice")" class="stat-link">
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="stat-card content">
+            <div class="stat-icon">
+                <i class="fas fa-images"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Catalog Management</h3>
+                <p class="stat-number">3 Carousels</p>
+                <p class="stat-description">Update catalog and promotional content</p>
+            </div>
+            <a href="@Url.Action("Index", "Carousels")" class="stat-link">
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Actions Section -->
+    <div class="quick-actions-section">
+        <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+        <div class="quick-actions">
+            <a href="@Url.Action("AddJob", "HR")" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-plus-circle"></i>
+                </div>
+                <div class="action-text">
+                    <h4>Add New Job</h4>
+                    <p>Create a new job posting</p>
+                </div>
+            </a>
+
+            <a href="@Url.Action("Index", "Invoice")" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-upload"></i>
+                </div>
+                <div class="action-text">
+                    <h4>Upload Invoices</h4>
+                    <p>Compare with system data</p>
+                </div>
+            </a>
+
+            <a href="@Url.Action("PendingPayments", "Invoice")" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="action-text">
+                    <h4>Pending Payments</h4>
+                    <p>Manage unreconciled invoices</p>
+                </div>
+            </a>
+
+            <a href="@Url.Action("Index", "Carousels")" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <div class="action-text">
+                    <h4>Update Carousels</h4>
+                    <p>Change promotional content</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Recent Activity Section -->
+    <div class="recent-activity-section">
+        <h2><i class="fas fa-history"></i> Recent Activity</h2>
+        <div class="activity-list">
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <div class="activity-details">
+                    <h4>New Job Posted</h4>
+                    <p>"Digital Transformation Coordinator" was added</p>
+                    <span class="activity-time">April 16, 2025</span>
+                </div>
+            </div>
+
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-file-invoice"></i>
+                </div>
+                <div class="activity-details">
+                    <h4>Invoices Reconciled</h4>
+                    <p>15 invoices were matched and reconciled</p>
+                    <span class="activity-time">April 21, 2025</span>
+                </div>
+            </div>
+
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-images"></i>
+                </div>
+                <div class="activity-details">
+                    <h4>Carousel Updated</h4>
+                    <p>New promotional content for Castrol added</p>
+                    <span class="activity-time">April 22, 2025</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Initialize any JavaScript functionality here
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add animation effects to cards
+            document.querySelectorAll('.stat-card, .action-card, .activity-item').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = '';
+                });
+            });
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        /* Dashboard Layout */
+        .welcome-dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Welcome Header */
+        .welcome-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .welcome-header h1 {
+            margin: 0;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .welcome-header .lead {
+            color: #555;
+            margin: 0.5rem 0;
+        }
+
+        .user-greeting {
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50px;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+
+        /* Stats Overview */
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+        }
+
+        .stat-card.jobs::before {
+            background-color: #4CAF50;
+        }
+
+        .stat-card.invoices::before {
+            background-color: #FFC107;
+        }
+
+        .stat-card.content::before {
+            background-color: #2196F3;
+        }
+
+        .stat-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .stat-card.jobs .stat-icon {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: #4CAF50;
+        }
+
+        .stat-card.invoices .stat-icon {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: #FFC107;
+        }
+
+        .stat-card.content .stat-icon {
+            background-color: rgba(33, 150, 243, 0.1);
+            color: #2196F3;
+        }
+
+        .stat-content {
+            flex: 1;
+        }
+
+        .stat-content h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0.3rem 0;
+            color: #333;
+        }
+
+        .stat-description {
+            font-size: 0.85rem;
+            color: #666;
+            margin: 0;
+        }
+
+        .stat-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f5f5f5;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .stat-link:hover {
+            background-color: #e0e0e0;
+            transform: scale(1.1);
+        }
+
+        /* Quick Actions Section */
+        .quick-actions-section {
+            margin-bottom: 2rem;
+        }
+
+        .quick-actions-section h2 {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .action-card {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            padding: 1.2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .action-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            margin-right: 1rem;
+            background-color: #f5f5f5;
+            color: #555;
+            font-size: 1.1rem;
+        }
+
+        .action-text {
+            flex: 1;
+        }
+
+        .action-text h4 {
+            margin: 0;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .action-text p {
+            margin: 0.3rem 0 0;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        /* Recent Activity Section */
+        .recent-activity-section {
+            margin-bottom: 2rem;
+        }
+
+        .recent-activity-section h2 {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .activity-list {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .activity-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 1rem;
+            background-color: #f5f5f5;
+            color: #555;
+            font-size: 1rem;
+        }
+
+        .activity-details {
+            flex: 1;
+        }
+
+        .activity-details h4 {
+            margin: 0;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .activity-details p {
+            margin: 0.2rem 0 0;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: #999;
+        }
+    </style>
+}

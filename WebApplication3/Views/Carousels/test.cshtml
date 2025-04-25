@@ -1,0 +1,1299 @@
+﻿@model WebApplication3.Models.CarouselModel
+@{
+    ViewData["Title"] = "Landing Page Manager";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.css" />
+<style>
+    /* Include the CSS from landing-page-styles here */
+    .landing-page-editor {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f9f9f9;
+        padding: 20px;
+        min-height: 100vh;
+    }
+
+    .editor-toolbar {
+        background-color: #fff;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .editor-toolbar h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: #333;
+        }
+
+    .toolbar-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .editor-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .carousel-editors {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+    }
+
+    .carousel-section {
+        margin-bottom: 20px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+        .carousel-section.active {
+            border-color: #4a89dc;
+            box-shadow: 0 0 0 1px rgba(74, 137, 220, 0.2);
+        }
+
+        .carousel-section.inactive {
+            opacity: 0.7;
+        }
+
+    .section-header {
+        background-color: #f5f5f5;
+        padding: 12px 15px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .section-toggle {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .section-toggle h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: #444;
+        }
+
+    .toggle-icon {
+        transition: transform 0.3s ease;
+    }
+
+    .collapsed .toggle-icon {
+        transform: rotate(-90deg);
+    }
+
+    .section-content {
+        padding: 15px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        max-height: 2000px; /* Arbitrary large value */
+    }
+
+        .section-content.collapsed {
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            overflow: hidden;
+        }
+
+    .carousel-items {
+        min-height: 100px;
+        border: 1px dashed #ccc;
+        border-radius: 6px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .empty-state {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100px;
+        color: #888;
+        font-style: italic;
+    }
+
+    .carousel-item {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        display: flex;
+        overflow: hidden;
+        transition: all 0.2s ease;
+    }
+
+        .carousel-item:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .carousel-item.dragging {
+            opacity: 0.5;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+    .item-drag-handle {
+        width: 40px;
+        background-color: #eee;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: grab;
+        color: #888;
+    }
+
+    .item-content {
+        flex: 1;
+        padding: 10px;
+    }
+
+    .item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .item-title {
+        font-weight: 600;
+        color: #444;
+    }
+
+    .item-form {
+        padding: 5px 0;
+    }
+
+    .image-preview {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 120px;
+        border: 1px solid #eee;
+        border-radius: 4px;
+        padding: 10px;
+        background-color: #f9f9f9;
+    }
+
+    .preview-panel {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .preview-header {
+        background-color: #f5f5f5;
+        padding: 12px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+        .preview-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: #444;
+        }
+
+    .preview-controls {
+        display: flex;
+        gap: 5px;
+    }
+
+    .preview-container {
+        flex: 1;
+        padding: 20px;
+        overflow: auto;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+        .preview-container iframe {
+            width: 100%;
+            height: 100%;
+            border: 1px solid #eee;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Preview device sizes */
+        .preview-container.desktop-view {
+            width: 100%;
+            height: 600px;
+        }
+
+        .preview-container.tablet-view {
+            width: 768px;
+            height: 600px;
+            margin: 0 auto;
+        }
+
+        .preview-container.mobile-view {
+            width: 375px;
+            height: 600px;
+            margin: 0 auto;
+        }
+
+    /* Image library modal styles */
+    .image-library-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+        padding: 10px;
+    }
+
+    .library-image-item {
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 10px;
+        background-color: #fff;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+        .library-image-item:hover {
+            border-color: #4a89dc;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .library-image-preview {
+        height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 8px;
+    }
+
+        .library-image-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+    .library-image-info {
+        font-size: 0.85rem;
+        color: #666;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
+<div class="landing-page-editor">
+    <!-- Main toolbar -->
+    <div class="editor-toolbar">
+        <h1>Landing Page Manager</h1>
+        <div class="toolbar-actions">
+            <button type="button" id="previewBtn" class="btn btn-primary">
+                <i class="fas fa-eye"></i> Preview
+            </button>
+            <button type="button" id="generateBtn" class="btn btn-success">
+                <i class="fas fa-file-code"></i> Generate HTML
+            </button>
+        </div>
+    </div>
+
+    <div class="editor-container">
+        <!-- Left side: Carousel editors -->
+        <div class="carousel-editors">
+            <form id="landingPageForm" asp-action="GenerateImprovedHtml" method="post">
+                <!-- Seminario section -->
+                <div class="carousel-section @(Model.NeedsSeminario ? "active" : "inactive")" id="seminario-section">
+                    <div class="section-header" onclick="toggleSection('seminario-content')">
+                        <div class="section-toggle">
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                            <h2>Σεμινάριο (Seminario)</h2>
+                        </div>
+                        <div class="section-actions">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox"
+                                       asp-for="NeedsSeminario"
+                                       id="seminarioToggle"
+                                       onchange="toggleSectionActive('seminario-section', this.checked)">
+                                <label class="form-check-label" for="seminarioToggle">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-content" id="seminario-content">
+                        <!-- Carousel items container -->
+                        <div class="carousel-items" id="seminario-items">
+                            @if (Model.SeminarioImages != null && Model.SeminarioImages.Count > 0)
+                            {
+                                @for (int i = 0; i < Model.SeminarioImages.Count; i++)
+                                {
+                                    var image = Model.SeminarioImages[i];
+                                    <div class="carousel-item" data-index="@i" draggable="true">
+                                        <div class="item-drag-handle">
+                                            <i class="fas fa-grip-lines"></i>
+                                        </div>
+                                        <div class="item-content">
+                                            <div class="item-header">
+                                                <span class="item-title">Image @(i + 1)</span>
+                                                <div class="item-actions">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger item-delete"
+                                                            onclick="removeCarouselItem(this)">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="item-form">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="mb-2">
+                                                            <label class="form-label">Image URL:</label>
+                                                            <input type="text" class="form-control image-url"
+                                                                   name="SeminarioImages[@i].Url" value="@image.Url"
+                                                                   onchange="updateImagePreview(this)" placeholder="https://...">
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <label class="form-label">Image ID:</label>
+                                                            <input type="text" class="form-control"
+                                                                   name="SeminarioImages[@i].ImageId" value="@image.ImageId"
+                                                                   placeholder="castrol, isse, etc">
+                                                        </div>
+                                                        <div class="form-check mb-2">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                   name="SeminarioImages[@i].IncludePostMessage"
+                                                                   value="true" @(image.IncludePostMessage ? "checked" : "")>
+                                                            <label class="form-check-label">Enable click tracking</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="mb-2">
+                                                            <label class="form-label">Previous images:</label>
+                                                            <select class="form-select old-image-select"
+                                                                    name="SeminarioImages[@i].OldImageSelection"
+                                                                    onchange="selectPreviousImage(this)">
+                                                                <option value="">-- Select previous image --</option>
+                                                                @if (Model.OldSeminarioImages != null)
+                                                                {
+                                                                    @foreach (var oldImage in Model.OldSeminarioImages)
+                                                                    {
+                                                                        if (!string.IsNullOrEmpty(oldImage.ImageId) && !string.IsNullOrEmpty(oldImage.Url))
+                                                                        {
+                                                                            <option value="@oldImage.ImageId" data-url="@oldImage.Url" selected="@(image.OldImageSelection == oldImage.ImageId)"> </option>
+                                                                        }
+                                                                    }
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                        <div class="image-preview">
+                                                            <img src="@image.Url" class="img-thumbnail" style="max-height: 100px; max-width: 100%;">
+                                                            <div class="mt-1 text-center">
+                                                                <small class="text-muted">Preview</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="empty-state">
+                                    <p>No items added yet. Click "Add Image" to start.</p>
+                                </div>
+                            }
+                        </div>
+                        <div class="section-actions mt-3">
+                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                    onclick="addCarouselItem('seminario', 'SeminarioImages')">
+                                <i class="fas fa-plus"></i> Add Image
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Energeies tou Mina section -->
+                <div class="carousel-section @(Model.NeedsEnergeiesTouMina ? "active" : "inactive")" id="energeies-section">
+                    <div class="section-header" onclick="toggleSection('energeies-content')">
+                        <div class="section-toggle">
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                            <h2>Ενέργειες του Μήνα (Monthly Actions)</h2>
+                        </div>
+                        <div class="section-actions">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox"
+                                       asp-for="NeedsEnergeiesTouMina"
+                                       id="energeiesToggle"
+                                       onchange="toggleSectionActive('energeies-section', this.checked)">
+                                <label class="form-check-label" for="energeiesToggle">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-content" id="energeies-content">
+                        <!-- Carousel items container -->
+                        <div class="carousel-items" id="energeies-items">
+                            @if (Model.EnergeiesImages != null && Model.EnergeiesImages.Count > 0)
+                            {
+                                @for (int i = 0; i < Model.EnergeiesImages.Count; i++)
+                                {
+                                    var image = Model.EnergeiesImages[i];
+                                    <div class="carousel-item" data-index="@i" draggable="true">
+                                        <div class="item-drag-handle">
+                                            <i class="fas fa-grip-lines"></i>
+                                        </div>
+                                        <div class="item-content">
+                                            <div class="item-header">
+                                                <span class="item-title">Image @(i + 1)</span>
+                                                <div class="item-actions">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger item-delete"
+                                                            onclick="removeCarouselItem(this)">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="item-form">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="mb-2">
+                                                            <label class="form-label">Image URL:</label>
+                                                            <input type="text" class="form-control image-url"
+                                                                   name="EnergeiesImages[@i].Url" value="@image.Url"
+                                                                   onchange="updateImagePreview(this)" placeholder="https://...">
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <label class="form-label">Image ID:</label>
+                                                            <input type="text" class="form-control"
+                                                                   name="EnergeiesImages[@i].ImageId" value="@image.ImageId"
+                                                                   placeholder="castrol, isse, etc">
+                                                        </div>
+                                                        <div class="form-check mb-2">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                   name="EnergeiesImages[@i].IncludePostMessage"
+                                                                   value="true" @(image.IncludePostMessage ? "checked" : "")>
+                                                            <label class="form-check-label">Enable click tracking</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="mb-2">
+                                                            <label class="form-label">Previous images:</label>
+                                                            <select class="form-select old-image-select"
+                                                                    name="EnergeiesImages[@i].OldImageSelection"
+                                                                    onchange="selectPreviousImage(this)">
+                                                                <option value="">-- Select previous image --</option>
+                                                                @if (Model.OldEnergeiesImages != null)
+                                                                {
+                                                                    @foreach (var oldImage in Model.OldEnergeiesImages)
+                                                                    {
+                                                                        if (!string.IsNullOrEmpty(oldImage.ImageId) && !string.IsNullOrEmpty(oldImage.Url))
+                                                                        {
+                                                                            <option value="@oldImage.ImageId" data-url="@oldImage.Url" selected="@(image.OldImageSelection == oldImage.ImageId)"> </option>
+                                                                        }
+                                                                    }
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                        <div class="image-preview">
+                                                            <img src="@image.Url" class="img-thumbnail" style="max-height: 100px; max-width: 100%;">
+                                                            <div class="mt-1 text-center">
+                                                                <small class="text-muted">Preview</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="empty-state">
+                                    <p>No items added yet. Click "Add Image" to start.</p>
+                                </div>
+                            }
+                        </div>
+                        <div class="section-actions mt-3">
+                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                    onclick="addCarouselItem('energeies', 'EnergeiesImages')">
+                                <i class="fas fa-plus"></i> Add Image
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prosfores section -->
+                <div class="carousel-section @(Model.NeedsProsforesExoplismou ? "active" : "inactive")" id="prosfores-section">
+                    <div class="section-header" onclick="toggleSection('prosfores-content')">
+                        <div class="section-toggle">
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                            <h2>Προσφορές Εξοπλισμού (Equipment Offers)</h2>
+                        </div>
+                        <div class="section-actions">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox"
+                                       asp-for="NeedsProsforesExoplismou"
+                                       id="prosforesToggle"
+                                       onchange="toggleSectionActive('prosfores-section', this.checked)">
+                                <label class="form-check-label" for="prosforesToggle">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-content" id="prosfores-content">
+                        <!-- Carousel items container -->
+                        <div class="carousel-items" id="prosfores-items">
+                            @if (Model.ProsforesImages != null && Model.ProsforesImages.Count > 0)
+                            {
+                                @for (int i = 0; i < Model.ProsforesImages.Count; i++)
+                                {
+                                    var image = Model.ProsforesImages[i];
+                                    <div class="carousel-item" data-index="@i" draggable="true">
+                                        <div class="item-drag-handle">
+                                            <i class="fas fa-grip-lines"></i>
+                                        </div>
+                                        <div class="item-content">
+                                            <div class="item-header">
+                                                <span class="item-title">Image @(i + 1)</span>
+                                                <div class="item-actions">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger item-delete"
+                                                            onclick="removeCarouselItem(this)">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="item-form">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="mb-2">
+                                                            <label class="form-label">Image URL:</label>
+                                                            <input type="text" class="form-control image-url"
+                                                                   name="ProsforesImages[@i].Url" value="@image.Url"
+                                                                   onchange="updateImagePreview(this)" placeholder="https://...">
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <label class="form-label">Image ID:</label>
+                                                            <input type="text" class="form-control"
+                                                                   name="ProsforesImages[@i].ImageId" value="@image.ImageId"
+                                                                   placeholder="castrol, isse, etc">
+                                                        </div>
+                                                        <div class="form-check mb-2">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                   name="ProsforesImages[@i].IncludePostMessage"
+                                                                   value="true" @(image.IncludePostMessage ? "checked" : "")>
+                                                            <label class="form-check-label">Enable click tracking</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="mb-2">
+                                                            <label class="form-label">Previous images:</label>
+                                                            <select class="form-select old-image-select"
+                                                                    name="ProsforesImages[@i].OldImageSelection"
+                                                                    onchange="selectPreviousImage(this)">
+                                                                <option value="">-- Select previous image --</option>
+                                                                @if (Model.OldProsforesImages != null)
+                                                                {
+                                                                    @foreach (var oldImage in Model.OldProsforesImages)
+                                                                    {
+                                                                        if (!string.IsNullOrEmpty(oldImage.ImageId) && !string.IsNullOrEmpty(oldImage.Url))
+                                                                        {
+                                                                            <option value="@oldImage.ImageId" data-url="@oldImage.Url" selected="@(image.OldImageSelection == oldImage.ImageId)"> </option>
+                                                                        }
+                                                                    }
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                        <div class="image-preview">
+                                                            <img src="@image.Url" class="img-thumbnail" style="max-height: 100px; max-width: 100%;">
+                                                            <div class="mt-1 text-center">
+                                                                <small class="text-muted">Preview</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="empty-state">
+                                    <p>No items added yet. Click "Add Image" to start.</p>
+                                </div>
+                            }
+                        </div>
+                        <div class="section-actions mt-3">
+                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                    onclick="addCarouselItem('prosfores', 'ProsforesImages')">
+                                <i class="fas fa-plus"></i> Add Image
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hidden inputs to maintain data -->
+                <input type="hidden" id="seminarioCount" name="SeminarioImageCount" value="@(Model.SeminarioImages?.Count ?? 0)">
+                <input type="hidden" id="energeiesCount" name="EnergeiesTouMinaImageCount" value="@(Model.EnergeiesImages?.Count ?? 0)">
+                <input type="hidden" id="prosforesTouCount" name="ProsforesExoplismouImageCount" value="@(Model.ProsforesImages?.Count ?? 0)">
+
+                <div class="form-actions mt-4 text-center">
+                    <button type="submit" class="btn btn-lg btn-success">
+                        <i class="fas fa-save"></i> Save & Generate HTML
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right side: Preview panel -->
+        <div class="preview-panel">
+            <div class="preview-header">
+                <h3>Real-time Preview</h3>
+                <div class="preview-controls">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="togglePreviewSize('desktop')">
+                        <i class="fas fa-desktop"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="togglePreviewSize('tablet')">
+                        <i class="fas fa-tablet-alt"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="togglePreviewSize('mobile')">
+                        <i class="fas fa-mobile-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="preview-container desktop-view">
+                <iframe id="previewFrame" src="about:blank"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image item template (hidden, will be cloned by JavaScript) -->
+<template id="carousel-item-template">
+    <div class="carousel-item" data-index="0" draggable="true">
+        <div class="item-drag-handle">
+            <i class="fas fa-grip-lines"></i>
+        </div>
+        <div class="item-content">
+            <div class="item-header">
+                <span class="item-title">Image 1</span>
+                <div class="item-actions">
+                    <button type="button" class="btn btn-sm btn-outline-danger item-delete"
+                            onclick="removeCarouselItem(this)">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="item-form">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <label class="form-label">Image URL:</label>
+                            <input type="text" class="form-control image-url" name="placeholder_Images[0].Url"
+                                   onchange="updateImagePreview(this)" placeholder="https://...">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Image ID:</label>
+                            <input type="text" class="form-control" name="placeholder_Images[0].ImageId"
+                                   placeholder="castrol, isse, etc">
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="placeholder_Images[0].IncludePostMessage" value="true">
+                            <label class="form-check-label">Enable click tracking</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <label class="form-label">Previous images:</label>
+                            <select class="form-select old-image-select" name="placeholder_Images[0].OldImageSelection"
+                                    onchange="selectPreviousImage(this)">
+                                <option value="">-- Select previous image --</option>
+                                <!-- Options will be populated dynamically -->
+                            </select>
+                        </div>
+                        <div class="image-preview">
+                            <img src="" class="img-thumbnail" style="max-height: 100px; max-width: 100%;">
+                            <div class="mt-1 text-center">
+                                <small class="text-muted">Preview</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- Modal for HTML output -->
+<div class="modal fade" id="htmlOutputModal" tabindex="-1" aria-labelledby="htmlOutputModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="htmlOutputModalLabel">Generated HTML</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="generatedHtml" class="form-label">HTML Code:</label>
+                    <textarea id="generatedHtml" class="form-control" rows="10" readonly></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="copyHtmlToClipboard()">
+                    <i class="fas fa-copy"></i> Copy HTML
+                </button>
+                <form asp-action="DownloadHtml" method="post" class="d-inline">
+                    <input type="hidden" id="finalHtmlInput" name="finalHtml" value="">
+                    <button type="submit" class="btn btn-success" onclick="prepareHtmlDownload()">
+                        <i class="fas fa-download"></i> Download HTML
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Initialize previous images data for JavaScript -->
+<script>
+    // Store previous images data for dropdowns
+    var oldSeminarioImages = @Html.Raw(Json.Serialize(Model.OldSeminarioImages));
+    var oldEnergeiesImages = @Html.Raw(Json.Serialize(Model.OldEnergeiesImages));
+    var oldProsforesImages = @Html.Raw(Json.Serialize(Model.OldProsforesImages));
+
+    // If we have existing images in the model
+    var existingSeminarioImages = @Html.Raw(Json.Serialize(Model.SeminarioImages));
+    var existingEnergeiesImages = @Html.Raw(Json.Serialize(Model.EnergeiesImages));
+    var existingProsforesImages = @Html.Raw(Json.Serialize(Model.ProsforesImages));
+</script>
+
+<!-- JavaScript for carousel management -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+    // Global variables to store data
+    let previousImages = {
+        seminario: [],
+        energeies: [],
+        prosfores: []
+    };
+
+    let itemCounts = {
+        seminario: @(Model.SeminarioImages?.Count ?? 0),
+        energeies: @(Model.EnergeiesImages?.Count ?? 0),
+        prosfores: @(Model.ProsforesImages?.Count ?? 0)
+        };
+
+    // DOM Ready event handler
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize the page
+        initializePage();
+
+        // Set up sortable (drag-and-drop) functionality
+        setupSortable();
+
+        // Load any previous data
+        loadPreviousData();
+
+        // Set up event listeners
+        setupEventListeners();
+
+        // Update initial preview
+        updatePreview();
+    });
+
+    // Initialize the page
+    function initializePage() {
+        // Show/hide sections based on initial checkbox states
+        toggleSectionActive('seminario-section', document.getElementById('seminarioToggle').checked);
+        toggleSectionActive('energeies-section', document.getElementById('energeiesToggle').checked);
+        toggleSectionActive('prosfores-section', document.getElementById('prosforesToggle').checked);
+    }
+
+    // Set up sortable (drag-and-drop) functionality for each carousel
+    function setupSortable() {
+        const containers = document.querySelectorAll('.carousel-items');
+
+        containers.forEach(container => {
+            new Sortable(container, {
+                animation: 150,
+                handle: '.item-drag-handle',
+                ghostClass: 'dragging',
+                onSort: function (evt) {
+                    // Update the indices of all items
+                    updateItemIndices(container);
+
+                    // Update preview after sorting
+                    updatePreview();
+                }
+            });
+        });
+    }
+
+    // Update item indices after drag-and-drop
+    function updateItemIndices(container) {
+        const items = container.querySelectorAll('.carousel-item');
+        const type = container.id.split('-')[0]; // Extract type from container ID
+        const fieldPrefix = type.charAt(0).toUpperCase() + type.slice(1);
+
+        items.forEach((item, index) => {
+            // Update data-index attribute
+            item.setAttribute('data-index', index);
+
+            // Update title
+            const titleElement = item.querySelector('.item-title');
+            if (titleElement) {
+                titleElement.textContent = `Image ${index + 1}`;
+            }
+
+            // Update form field names
+            const inputs = item.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                const name = input.getAttribute('name');
+                if (name) {
+                    // Replace the index in the field name
+                    const newName = name.replace(/\[\d+\]/, `[${index}]`);
+                    input.setAttribute('name', newName);
+                }
+            });
+        });
+
+        // Update the count in the hidden field
+        document.getElementById(`${type}Count`).value = items.length;
+        itemCounts[type] = items.length;
+    }
+
+    // Load previous data from the model
+    function loadPreviousData() {
+        // Load from the variables defined at the top
+        if (typeof oldSeminarioImages !== 'undefined' && oldSeminarioImages) {
+            previousImages.seminario = oldSeminarioImages;
+        }
+
+        if (typeof oldEnergeiesImages !== 'undefined' && oldEnergeiesImages) {
+            previousImages.energeies = oldEnergeiesImages;
+        }
+
+        if (typeof oldProsforesImages !== 'undefined' && oldProsforesImages) {
+            previousImages.prosfores = oldProsforesImages;
+        }
+    }
+
+    // Set up event listeners
+    function setupEventListeners() {
+        // Preview button
+        document.getElementById('previewBtn').addEventListener('click', function () {
+            updatePreview();
+        });
+
+        // Generate HTML button
+        document.getElementById('generateBtn').addEventListener('click', function () {
+            generateAndShowHtml();
+        });
+
+        // Form submission handling
+        document.getElementById('landingPageForm').addEventListener('submit', function (e) {
+            // Validate form before submission
+            if (!validateForm()) {
+                e.preventDefault();
+                alert('Please fix the errors in the form before submitting.');
+            }
+        });
+
+        // Set up image URL input listeners
+        document.querySelectorAll('.image-url').forEach(input => {
+            input.addEventListener('change', function () {
+                updateImagePreview(this);
+            });
+        });
+
+        // Set up old image select listeners
+        document.querySelectorAll('.old-image-select').forEach(select => {
+            select.addEventListener('change', function () {
+                selectPreviousImage(this);
+            });
+        });
+    }
+
+    // Toggle section visibility
+    function toggleSection(contentId) {
+        const content = document.getElementById(contentId);
+        content.classList.toggle('collapsed');
+
+        // Update the icon
+        const sectionHeader = content.previousElementSibling;
+        const icon = sectionHeader.querySelector('.toggle-icon');
+
+        if (content.classList.contains('collapsed')) {
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-right');
+        } else {
+            icon.classList.remove('fa-chevron-right');
+            icon.classList.add('fa-chevron-down');
+        }
+    }
+
+    // Toggle section active state
+    function toggleSectionActive(sectionId, isActive) {
+        const section = document.getElementById(sectionId);
+
+        if (isActive) {
+            section.classList.add('active');
+            section.classList.remove('inactive');
+        } else {
+            section.classList.remove('active');
+            section.classList.add('inactive');
+        }
+
+        // Update preview
+        updatePreview();
+    }
+
+    // Add a new carousel item
+    function addCarouselItem(type, fieldPrefix, existingData = null) {
+        // Get the container
+        const container = document.getElementById(`${type}-items`);
+
+        // Remove empty state if it exists
+        const emptyState = container.querySelector('.empty-state');
+        if (emptyState) {
+            emptyState.remove();
+        }
+
+        // Clone the template
+        const template = document.getElementById('carousel-item-template');
+        const clone = template.content.cloneNode(true);
+        const newItem = clone.querySelector('.carousel-item');
+
+        // Set the index
+        const index = itemCounts[type];
+        newItem.setAttribute('data-index', index);
+
+        // Update the title
+        const titleElement = newItem.querySelector('.item-title');
+        titleElement.textContent = `Image ${index + 1}`;
+
+        // Update form field names
+        const inputs = newItem.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            const name = input.getAttribute('name');
+            if (name) {
+                const newName = name.replace('placeholder_', `${fieldPrefix}`).replace('[0]', `[${index}]`);
+                input.setAttribute('name', newName);
+            }
+        });
+
+        // Populate previous images dropdown
+        const selectElement = newItem.querySelector('.old-image-select');
+        populatePreviousImagesDropdown(selectElement, type);
+
+        // Populate with existing data if provided
+        if (existingData) {
+            newItem.querySelector('.image-url').value = existingData.Url || '';
+            newItem.querySelector('input[name$=".ImageId"]').value = existingData.ImageId || '';
+
+            if (existingData.IncludePostMessage) {
+                newItem.querySelector('input[name$=".IncludePostMessage"]').checked = true;
+            }
+
+            // Update the preview image
+            const previewImg = newItem.querySelector('.image-preview img');
+            if (existingData.Url) {
+                previewImg.src = existingData.Url;
+            }
+        }
+
+        // Add event listeners
+        setupItemEventListeners(newItem);
+
+        // Append the new item to the container
+        container.appendChild(newItem);
+
+        // Increment the count
+        itemCounts[type]++;
+        document.getElementById(`${type}Count`).value = itemCounts[type];
+
+        // Update preview
+        updatePreview();
+
+        return newItem;
+    }
+
+    // Set up event listeners for individual carousel items
+    function setupItemEventListeners(item) {
+        // Image URL change
+        const urlInput = item.querySelector('.image-url');
+        if (urlInput) {
+            urlInput.addEventListener('change', function () {
+                updateImagePreview(this);
+            });
+            urlInput.addEventListener('input', function () {
+                // Real-time preview update as user types
+                debounce(updateImagePreview, 300)(this);
+            });
+        }
+
+        // Previous image selection
+        const oldImageSelect = item.querySelector('.old-image-select');
+        if (oldImageSelect) {
+            oldImageSelect.addEventListener('change', function () {
+                selectPreviousImage(this);
+            });
+        }
+    }
+
+    // Populate previous images dropdown
+    function populatePreviousImagesDropdown(selectElement, type) {
+        // Clear existing options (keep the default empty option)
+        while (selectElement.options.length > 1) {
+            selectElement.remove(1);
+        }
+
+        // Add options from previous images
+        if (previousImages[type] && previousImages[type].length > 0) {
+            previousImages[type].forEach(image => {
+                if (image.ImageId && image.Url) {
+                    const option = document.createElement('option');
+                    option.value = image.ImageId;
+                    option.textContent = `${image.ImageId} - ${truncateText(image.Url, 30)}`;
+                    option.setAttribute('data-url', image.Url);
+                    selectElement.appendChild(option);
+                }
+            });
+        }
+    }
+
+    // Helper function to truncate text
+    function truncateText(text, maxLength) {
+        if (!text) return '';
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength - 3) + '...';
+    }
+
+    // Update image preview when URL changes
+    function updateImagePreview(input) {
+        const itemContainer = input.closest('.carousel-item');
+        const previewImg = itemContainer.querySelector('.image-preview img');
+        const url = input.value.trim();
+
+        if (url) {
+            previewImg.src = url;
+            previewImg.onload = function () {
+                // Image loaded successfully
+                previewImg.style.display = 'block';
+            };
+            previewImg.onerror = function () {
+                // Image failed to load
+                previewImg.style.display = 'none';
+                // You could add error feedback here
+            };
+        } else {
+            previewImg.style.display = 'none';
+        }
+
+        // Update the real-time preview
+        updatePreview();
+    }
+
+    // Select a previous image
+    function selectPreviousImage(select) {
+        const selectedOption = select.options[select.selectedIndex];
+        if (selectedOption.value) {
+            const imageUrl = selectedOption.getAttribute('data-url');
+
+            // Update the URL input
+            const itemContainer = select.closest('.carousel-item');
+            const urlInput = itemContainer.querySelector('.image-url');
+            urlInput.value = imageUrl;
+
+            // Update preview
+            const previewImg = itemContainer.querySelector('.image-preview img');
+            previewImg.src = imageUrl;
+            previewImg.style.display = 'block';
+
+            // Update the real-time preview
+            updatePreview();
+        }
+    }
+
+    // Remove a carousel item
+    function removeCarouselItem(button) {
+        const item = button.closest('.carousel-item');
+        const container = item.parentElement;
+        const type = container.id.split('-')[0]; // Extract type from container ID
+
+        // Remove the item
+        container.removeChild(item);
+
+        // Update indices
+        updateItemIndices(container);
+
+        // Add empty state if no items left
+        if (container.children.length === 0) {
+            const emptyState = document.createElement('div');
+            emptyState.className = 'empty-state';
+            emptyState.innerHTML = '<p>No items added yet. Click "Add Image" to start.</p>';
+            container.appendChild(emptyState);
+        }
+
+        // Update preview
+        updatePreview();
+    }
+
+    // Update the real-time preview
+    function updatePreview() {
+        // Get form data
+        const formData = new FormData(document.getElementById('landingPageForm'));
+
+        // Make an AJAX request to get a preview
+        fetch('/Carousels/GeneratePreview', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.text())
+            .then(html => {
+                // Update the preview iframe
+                const iframe = document.getElementById('previewFrame');
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                iframeDoc.open();
+                iframeDoc.write(html);
+                iframeDoc.close();
+            })
+            .catch(error => {
+                console.error('Preview generation failed:', error);
+            });
+    }
+
+    // Toggle preview size (responsive testing)
+    function togglePreviewSize(size) {
+        const container = document.querySelector('.preview-container');
+
+        // Remove all size classes
+        container.classList.remove('desktop-view', 'tablet-view', 'mobile-view');
+
+        // Add the requested size class
+        container.classList.add(`${size}-view`);
+    }
+
+    // Generate and show HTML
+    function generateAndShowHtml() {
+        // Get form data
+        const formData = new FormData(document.getElementById('landingPageForm'));
+
+        // Make an AJAX request to generate HTML
+        fetch('/Carousels/GenerateImprovedHtml', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.text())
+            .then(html => {
+                // Show the HTML in modal
+                document.getElementById('generatedHtml').value = html;
+                document.getElementById('finalHtmlInput').value = html;
+
+                // Open the modal
+                const modal = new bootstrap.Modal(document.getElementById('htmlOutputModal'));
+                modal.show();
+            })
+            .catch(error => {
+                console.error('HTML generation failed:', error);
+                alert('Failed to generate HTML. Please try again.');
+            });
+    }
+
+    // Copy HTML to clipboard
+    function copyHtmlToClipboard() {
+        const textarea = document.getElementById('generatedHtml');
+        textarea.select();
+        document.execCommand('copy');
+
+        // Show feedback
+        const copyButton = document.querySelector('#htmlOutputModal .btn-primary');
+        const originalText = copyButton.innerHTML;
+        copyButton.innerHTML = '<i class="fas fa-check"></i> Copied!';
+
+        setTimeout(() => {
+            copyButton.innerHTML = originalText;
+        }, 2000);
+    }
+
+    // Prepare HTML for download
+    function prepareHtmlDownload() {
+        const html = document.getElementById('generatedHtml').value;
+        document.getElementById('finalHtmlInput').value = html;
+    }
+
+    // Form validation
+    function validateForm() {
+        let isValid = true;
+
+        // Check if at least one section is active
+        const anyActive =
+            document.getElementById('seminarioToggle').checked ||
+            document.getElementById('energeiesToggle').checked ||
+            document.getElementById('prosforesToggle').checked;
+
+        if (!anyActive) {
+            alert('Please activate at least one carousel section.');
+            return false;
+        }
+
+        // Validate active sections have at least one image
+        if (document.getElementById('seminarioToggle').checked) {
+            const count = document.querySelectorAll('#seminario-items .carousel-item').length;
+            if (count === 0) {
+                alert('Please add at least one image to the Seminario section.');
+                isValid = false;
+            }
+        }
+
+        if (document.getElementById('energeiesToggle').checked) {
+            const count = document.querySelectorAll('#energeies-items .carousel-item').length;
+            if (count === 0) {
+                alert('Please add at least one image to the Energeies tou Mina section.');
+                isValid = false;
+            }
+        }
+
+        if (document.getElementById('prosforesToggle').checked) {
+            const count = document.querySelectorAll('#prosfores-items .carousel-item').length;
+            if (count === 0) {
+                alert('Please add at least one image to the Prosfores section.');
+                isValid = false;
+            }
+        }
+
+        // Validate image URLs
+        const urlInputs = document.querySelectorAll('.image-url');
+        urlInputs.forEach(input => {
+            if (input.closest('.carousel-section').classList.contains('active')) {
+                const url = input.value.trim();
+                if (!url) {
+                    alert('Please enter a URL for all images in active sections.');
+                    isValid = false;
+                }
+            }
+        });
+
+        return isValid;
+    }
+
+    // Debounce function to limit how often a function is called
+    function debounce(func, wait) {
+        let timeout;
+        return function (...args) {
+            const context = this;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), wait);
+        };
+    }
+</script>

@@ -1,0 +1,58 @@
+[
+  {
+    "Id": 2,
+    "Title": "ssss",
+    "Summary": "ssss",
+    "Details": "sssss",
+    "ApplyLink": "https://www.iaponiki.gr/simeia-polisis/",
+    "Location": null,
+    "PostingDate": "2025-01-21T00:00:00",
+    "ExpiryDate": "2025-05-14T00:00:00",
+    "Category": null,
+    "SalaryRange": null,
+    "IsActive": true,
+    "OrderId": 1
+  },
+  {
+    "Id": 3,
+    "Title": "ffffff",
+    "Summary": "fffff",
+    "Details": "ffffffff",
+    "ApplyLink": "https://www.iaponiki.gr/simeia-polisis/",
+    "Location": null,
+    "PostingDate": "2025-01-02T00:00:00",
+    "ExpiryDate": "2025-01-10T00:00:00",
+    "Category": null,
+    "SalaryRange": null,
+    "IsActive": false,
+    "OrderId": 0
+  },
+  {
+    "Id": 4,
+    "Title": "aaaa",
+    "Summary": "bbbb",
+    "Details": "bbbb",
+    "ApplyLink": "https://www.iaponiki.gr/simeia-polisis/",
+    "Location": null,
+    "PostingDate": "2025-01-30T00:00:00",
+    "ExpiryDate": "2025-02-07T00:00:00",
+    "Category": null,
+    "SalaryRange": null,
+    "IsActive": true,
+    "OrderId": 2
+  },
+  {
+    "Id": 5,
+    "Title": "Digital Transformation Coordinator",
+    "Summary": "fwefgwerg",
+    "Details": "rvgrwegrv ergrfvrwge re vre gvcr rwe vg",
+    "ApplyLink": "http://localhost:5168/HR/AddJob",
+    "Location": null,
+    "PostingDate": "2025-04-16T00:00:00",
+    "ExpiryDate": "2025-04-23T00:00:00",
+    "Category": null,
+    "SalaryRange": null,
+    "IsActive": true,
+    "OrderId": 0
+  }
+]

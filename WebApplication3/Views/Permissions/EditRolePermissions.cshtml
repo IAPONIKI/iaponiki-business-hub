@@ -1,0 +1,130 @@
+﻿@model WebApplication3.Models.RolePermissionsViewModel
+
+@{
+    ViewData["Title"] = $"Edit Permissions for {Model.RoleName}";
+
+    // Group permissions by category
+    var permissionsByCategory = Model.Permissions.GroupBy(p => p.Category).ToList();
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h2 class="mb-0 fs-4"><i class="fas fa-key me-2"></i>Edit Permissions for Role: @Model.RoleName</h2>
+            <a asp-action="Index" class="btn btn-light">
+                <i class="fas fa-arrow-left"></i> Back to Roles
+            </a>
+        </div>
+        <div class="card-body">
+            <form asp-action="EditRolePermissions" method="post">
+                <input type="hidden" asp-for="RoleId" />
+                <input type="hidden" asp-for="RoleName" />
+
+                <div class="mb-4">
+                    <p>
+                        Choose the permissions that users with this role should have.
+                        Permissions control what features and data users can access.
+                    </p>
+
+                    @if (Model.RoleName == "Admin")
+                    {
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i> The Admin role automatically has all permissions and cannot be modified.
+                        </div>
+                    }
+                </div>
+
+                <div class="accordion" id="permissionsAccordion">
+                    @foreach (var category in permissionsByCategory)
+                    {
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading@(category.Key.Replace(" ", ""))">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse@(category.Key.Replace(" ", ""))"
+                                        aria-expanded="true" aria-controls="collapse@(category.Key.Replace(" ", ""))">
+                                    <i class="fas fa-folder me-2"></i> @category.Key Permissions
+                                </button>
+                            </h2>
+                            <div id="collapse@(category.Key.Replace(" ", ""))" class="accordion-collapse collapse show"
+                                 aria-labelledby="heading@(category.Key.Replace(" ", ""))" data-bs-parent="#permissionsAccordion">
+                                <div class="accordion-body">
+                                    <div class="row">
+                                        @foreach (var permission in category)
+                                        {
+                                            <div class="col-md-6 mb-3">
+                                                <div class="card h-100 @(permission.IsViewPermission ? "border-info" : "")">
+                                                    <div class="card-body">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                   name="selectedPermissions" value="@permission.Name"
+                                                                   id="perm_@permission.Name"
+                                                            @(permission.IsAssigned ? "checked" : "")
+                                                            @(Model.RoleName == "Admin" ? "checked disabled" : "")>
+                                                            <label class="form-check-label fw-bold" for="perm_@permission.Name">
+                                                                @permission.DisplayName
+                                                                @if (permission.IsViewPermission)
+                                                                {
+                                                                    <span class="badge bg-info text-white ms-2">UI</span>
+                                                                }
+                                                            </label>
+                                                        </div>
+                                                        <p class="mb-0 mt-2 text-muted small">@permission.Description</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="mt-4 d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary" id="toggleAllBtn">Toggle All</button>
+                    <button type="submit" class="btn btn-primary"
+                    @(Model.RoleName == "Admin" ? "disabled" : "")>
+                        <i class="fas fa-save me-2"></i> Save Permissions
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleAllBtn = document.getElementById('toggleAllBtn');
+            const checkboxes = document.querySelectorAll('input[name="selectedPermissions"]:not([disabled])');
+            let allChecked = true;
+
+            // Check initial state
+            checkboxes.forEach(checkbox => {
+                if (!checkbox.checked) {
+                    allChecked = false;
+                }
+            });
+
+            toggleAllBtn.innerText = allChecked ? 'Uncheck All' : 'Check All';
+
+            // Toggle all checkboxes
+            toggleAllBtn.addEventListener('click', function () {
+                const newState = !allChecked;
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = newState;
+                });
+                allChecked = newState;
+                toggleAllBtn.innerText = allChecked ? 'Uncheck All' : 'Check All';
+            });
+
+            // Update button text when checkboxes change
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                    toggleAllBtn.innerText = allChecked ? 'Uncheck All' : 'Check All';
+                });
+            });
+        });
+    </script>
+}

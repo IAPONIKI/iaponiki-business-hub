@@ -1,0 +1,77 @@
+﻿@model WebApplication3.Models.HRModel.JobPostingsModel
+
+<h2 style="text-align: center; color: #333; margin-top: 20px;">Manage Jobs</h2>
+
+<!-- Sorting Options -->
+<div style="margin: 20px auto; max-width: 800px; background: #f9f9f9; padding: 20px; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+    <form asp-action="ManageJobs" method="get">
+        <label for="sortOrder" style="font-weight: bold;">Sort By:</label>
+        <select name="sortOrder" id="sortOrder" style="padding: 5px; margin-right: 10px;">
+            <option value="Title">Title</option>
+            <option value="PostingDate">Posting Date</option>
+            <option value="ExpiryDate">Expiry Date</option>
+            <option value="OrderId">Number of Order</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Sort</button>
+    </form>
+</div>
+
+<!-- Active Jobs Section -->
+<div style="margin: 20px auto; max-width: 800px; background: #f9f9f9; padding: 20px; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+    <h3 style="color: #007bff; margin-bottom: 20px;">Active Jobs</h3>
+    <ul style="list-style-type: none; padding: 0;">
+        @if (Model.CurrentPostings.Any())
+        {
+            @foreach (var job in Model.CurrentPostings)
+            {
+                <li style="padding: 15px; margin-bottom: 10px; background: #fff; border: 1px solid #ddd; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h4 style="margin: 0; color: #333;">@job.Title</h4>
+                        <small style="color: #666;">Posted on: @job.PostingDate.ToString("yyyy-MM-dd")</small>
+                    </div>
+                    <div>
+                        <a asp-action="EditJob" asp-route-id="@job.Id" class="btn btn-primary btn-sm" style="margin-right: 10px;">Edit</a>
+                        <a asp-action="DeleteJob" asp-route-id="@job.Id" class="btn btn-danger btn-sm">Delete</a>
+                    </div>
+                </li>
+            }
+        }
+        else
+        {
+            <p style="color: #888; text-align: center;">No active jobs found.</p>
+        }
+    </ul>
+</div>
+
+<!-- Inactive/Expired Jobs Section -->
+<div style="margin: 20px auto; max-width: 800px; background: #f9f9f9; padding: 20px; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+    <h3 style="color: #dc3545; margin-bottom: 20px;">Inactive/Expired Jobs</h3>
+    <ul style="list-style-type: none; padding: 0;">
+        @if (Model.PreviousPostings.Any())
+        {
+            @foreach (var job in Model.PreviousPostings)
+            {
+                <li style="padding: 15px; margin-bottom: 10px; background: #fff; border: 1px solid #ddd; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h4 style="margin: 0; color: #555;">@job.Title</h4>
+                        <small style="color: #888;">Expired on: @job.ExpiryDate.ToString("yyyy-MM-dd")</small>
+                    </div>
+                    <div>
+                        <a asp-action="EditJob" asp-route-id="@job.Id" class="btn btn-primary btn-sm" style="margin-right: 10px;">Edit</a>
+                        <a asp-action="DeleteJob" asp-route-id="@job.Id" class="btn btn-danger btn-sm">Delete</a>
+                    </div>
+                </li>
+            }
+        }
+        else
+        {
+            <p style="color: #888; text-align: center;">No inactive or expired jobs found.</p>
+        }
+    </ul>
+</div>
+
+<!-- Action Buttons -->
+<div style="text-align: center; margin-top: 20px;">
+    <a asp-action="AddJob" class="btn btn-success" style="margin-right: 10px;">Add New Job</a>
+    <a asp-action="UpdateJobOrder" class="btn btn-primary">Update Job Order</a>
+</div>

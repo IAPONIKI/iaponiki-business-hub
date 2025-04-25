@@ -1,0 +1,80 @@
+﻿@model WebApplication3.Models.PendingInvoiceData
+
+<div class="row">
+    <div class="col-md-6">
+        <h6 class="text-muted">Invoice Information</h6>
+        <dl class="row">
+            <dt class="col-sm-4">Invoice Info:</dt>
+            <dd class="col-sm-8">@Model.InvoiceInfo</dd>
+
+            <dt class="col-sm-4">Document ID:</dt>
+            <dd class="col-sm-8">@Model.InvoiceDocumentId</dd>
+
+            <dt class="col-sm-4">Date:</dt>
+            <dd class="col-sm-8">@Model.DateOnly</dd>
+
+            <dt class="col-sm-4">Repeated Reason:</dt>
+            <dd class="col-sm-8">@Model.RepeatedReason</dd>
+        </dl>
+    </div>
+
+    <div class="col-md-6">
+        <h6 class="text-muted">Payment Information</h6>
+        <dl class="row">
+            <dt class="col-sm-4">Amount:</dt>
+            <dd class="col-sm-8">€@Model.ERPAmount.ToString("N2")</dd>
+
+            <dt class="col-sm-4">Card PAN:</dt>
+            <dd class="col-sm-8">@Model.CardPAN</dd>
+
+            <dt class="col-sm-4">ERPTID:</dt>
+            <dd class="col-sm-8">@Model.ERPTID</dd>
+        </dl>
+    </div>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <h6 class="text-muted">Status Information</h6>
+        <dl class="row">
+            <dt class="col-sm-4">Status:</dt>
+            <dd class="col-sm-8">
+                <span class="badge @(Model.Status == "Pending" ? "bg-secondary" :
+                                    Model.Status == "Matched" ? "bg-success" :
+                                    Model.Status == "Resolved" ? "bg-info" : "bg-warning")">
+                    @Model.Status
+                </span>
+            </dd>
+
+            <dt class="col-sm-4">Added Date:</dt>
+            <dd class="col-sm-8">@Model.AddedDate.ToString("yyyy-MM-dd HH:mm")</dd>
+
+            @if (Model.LastModifiedDate.HasValue)
+            {
+                <dt class="col-sm-4">Last Modified:</dt>
+                <dd class="col-sm-8">@Model.LastModifiedDate.Value.ToString("yyyy-MM-dd HH:mm")</dd>
+
+                <dt class="col-sm-4">Modified By:</dt>
+                <dd class="col-sm-8">@Model.LastModifiedBy</dd>
+            }
+        </dl>
+    </div>
+
+    <div class="col-md-6">
+        <h6 class="text-muted">Notes</h6>
+        <div class="card">
+            <div class="card-body bg-light">
+                @if (string.IsNullOrEmpty(Model.Notes))
+                {
+                    <span class="text-muted">No notes available</span>
+                }
+                else
+                {
+                    <p>@Model.Notes</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

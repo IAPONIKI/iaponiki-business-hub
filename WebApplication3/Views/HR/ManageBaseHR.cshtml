@@ -1,0 +1,272 @@
+﻿@model WebApplication3.Models.HRModel.JobPostingsModel
+
+<h2 style="text-align: center; color: #333; margin-top: 20px;">Manage BaseHR</h2>
+
+<form asp-action="GenerateBaseHR" method="post" id="jobForm" style="max-width: 800px; margin: 0 auto; background: #f9f9f9; padding: 20px; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+    <input type="hidden" name="sortOrder" value="@ViewBag.SortOrder" />
+    <div>
+        <h3 style="color: #007bff; margin-bottom: 20px; text-align: center;">Select Active Jobs for HTML Export</h3>
+        <div class="text-end mb-4">
+            <a href="@Url.Action("UploadGuide", "HR")" class="btn btn-info">
+                <i class="fas fa-question-circle"></i> How to Upload to Website
+            </a>
+        </div>
+        <!-- Info box -->
+        <div style="padding: 12px; background-color: #e9f5ff; border-left: 4px solid #007bff; margin-bottom: 20px; border-radius: 4px;">
+            <p style="margin: 0; color: #333; font-size: 14px;">
+                <i class="fas fa-info-circle" style="color: #007bff; margin-right: 8px;"></i>
+                <strong>Tip:</strong> Select jobs and drag them to reorder. This order will be used in the generated HTML.
+            </p>
+        </div>
+
+        <!-- Select All Checkbox -->
+        <div style="margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+                <input type="checkbox" id="select-all" style="margin-right: 10px;" />
+                <label for="select-all" style="cursor: pointer; font-weight: bold; color: #555;">Select All</label>
+            </div>
+            <button type="button" id="save-order" class="btn btn-sm btn-outline-primary" disabled>
+                Save Order
+            </button>
+        </div>
+
+        <!-- Job List (Sortable) -->
+        <ul id="sortable-jobs" style="list-style-type: none; padding: 0; margin: 0;">
+            @foreach (var job in Model.CurrentPostings)
+            {
+                <li class="job-item" data-id="@job.Id" style="margin-bottom: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #fff; display: flex; align-items: center; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);">
+                    <div class="drag-handle" style="margin-right: 10px; cursor: grab; color: #aaa;">
+                        <i class="fas fa-grip-lines"></i>
+                    </div>
+                    <input type="checkbox" name="selectedJobIds" value="@job.Id" id="job-@job.Id" style="margin-right: 15px;" class="job-checkbox" />
+                    <label for="job-@job.Id" style="cursor: pointer; flex: 1;">
+                        <h4 style="margin: 0; color: #333;">@job.Title</h4>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <p style="margin: 5px 0 0; color: #555; font-size: 14px;">Category: @job.Category</p>
+                            <span class="order-badge" style="background-color: #f1f1f1; color: #666; padding: 2px 8px; border-radius: 12px; font-size: 12px;">Order: @job.OrderId</span>
+                        </div>
+                        <p style="margin: 5px 0 0; color: #777; font-size: 12px;">@job.Summary</p>
+                    </label>
+                    <input type="hidden" name="jobOrder[@job.Id]" class="job-order-input" value="@job.OrderId" />
+                </li>
+            }
+        </ul>
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+        <button type="button" id="preview-button" class="btn btn-secondary" style="padding: 10px 20px; border-radius: 5px; font-size: 16px;">
+            Preview HTML
+        </button>
+        <button type="submit" class="btn btn-primary" style="padding: 10px 20px; border-radius: 5px; font-size: 16px;">
+            Generate & Download HTML
+        </button>
+    </div>
+</form>
+
+<!-- Preview Section (Initially Hidden) -->
+<div id="preview-section" class="container mt-5" style="display: none; max-width: 800px; margin: 0 auto;">
+    <h2 class="text-center mb-4">HTML Preview</h2>
+
+    <!-- HTML Preview Panel -->
+    <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <label for="htmlOutput" class="form-label mb-0">Generated HTML Code:</label>
+            <button id="copy-html" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-copy"></i> Copy HTML
+            </button>
+        </div>
+        <textarea id="htmlOutput" class="form-control" rows="10"></textarea>
+    </div>
+
+    <!-- HTML Preview -->
+    <div class="mb-4">
+        <h3 class="text-center mb-3">Live Preview</h3>
+        <div class="border rounded bg-light shadow-sm" style="height: 500px; overflow: auto;">
+            <iframe id="preview-iframe" style="width: 100%; height: 100%; border: none;"></iframe>
+        </div>
+    </div>
+
+    <div class="text-center mb-5">
+        <button id="close-preview" class="btn btn-secondary">Close Preview</button>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Include Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
+    <!-- Include jQuery and jQuery UI for drag-and-drop -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Initialize sortable list
+            $("#sortable-jobs").sortable({
+                handle: ".drag-handle",
+                placeholder: "job-item-placeholder",
+                opacity: 0.7,
+                cursor: "move",
+                update: function (event, ui) {
+                    // Enable the save button when order changes
+                    $("#save-order").prop("disabled", false);
+
+                    // Update order numbers
+                    updateOrderNumbers();
+                }
+            });
+
+            // Function to update order numbers after sorting
+            function updateOrderNumbers() {
+                $(".job-item").each(function (index) {
+                    const jobId = $(this).data("id");
+                    const newOrder = index + 1;
+                    $(this).find(".order-badge").text("Order: " + newOrder);
+                    $(this).find(".job-order-input").val(newOrder);
+                });
+            }
+
+            // Save order button click handler
+            $("#save-order").click(function () {
+                const orderData = {};
+                $(".job-item").each(function (index) {
+                    const jobId = $(this).data("id");
+                    orderData[jobId] = index + 1;
+                });
+
+                // Send AJAX request to update job orders
+                $.ajax({
+                    url: '@Url.Action("UpdateJobOrder", "HR")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(orderData),
+                    success: function (response) {
+                        alert("Job order updated successfully!");
+                        $("#save-order").prop("disabled", true);
+                    },
+                    error: function (error) {
+                        alert("Error updating job order.");
+                    }
+                });
+            });
+
+            // "Select All" functionality
+            const selectAllCheckbox = document.getElementById("select-all");
+            const jobCheckboxes = document.querySelectorAll(".job-checkbox");
+
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener("change", function () {
+                    jobCheckboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                });
+
+                // Update select all checkbox state when individual checkboxes change
+                jobCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener("change", function () {
+                        const allChecked = [...jobCheckboxes].every(cb => cb.checked);
+                        const anyChecked = [...jobCheckboxes].some(cb => cb.checked);
+
+                        selectAllCheckbox.checked = allChecked;
+                        selectAllCheckbox.indeterminate = anyChecked && !allChecked;
+                    });
+                });
+            }
+
+            // Preview Button Click Handler
+            $("#preview-button").click(function () {
+                const selectedJobIds = [];
+                $(".job-checkbox:checked").each(function () {
+                    selectedJobIds.push($(this).val());
+                });
+
+                if (selectedJobIds.length === 0) {
+                    alert("Please select at least one job to preview.");
+                    return;
+                }
+
+                // Get the form data
+                const formData = new FormData(document.getElementById("jobForm"));
+
+                // Send AJAX request to get the HTML preview
+                $.ajax({
+                    url: '@Url.Action("PreviewBaseHR", "HR")',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (htmlContent) {
+                        // Update the preview
+                        $("#htmlOutput").val(htmlContent);
+
+                        // Set the iframe content
+                        const iframe = document.getElementById("preview-iframe");
+                        iframe.srcdoc = htmlContent;
+
+                        // Show the preview section
+                        $("#preview-section").show();
+
+                        // Scroll to the preview section
+                        $('html, body').animate({
+                            scrollTop: $("#preview-section").offset().top
+                        }, 800);
+                    },
+                    error: function (error) {
+                        alert("Error generating preview.");
+                    }
+                });
+            });
+
+            // Close Preview Button Click Handler
+            $("#close-preview").click(function () {
+                $("#preview-section").hide();
+
+                // Scroll back to the top
+                $('html, body').animate({
+                    scrollTop: 0
+                }, 800);
+            });
+
+            // Copy HTML Button Click Handler
+            $("#copy-html").click(function () {
+                const htmlOutput = document.getElementById("htmlOutput");
+                htmlOutput.select();
+                document.execCommand("copy");
+
+                // Show a temporary success message
+                const originalText = $(this).html();
+                $(this).html('<i class="fas fa-check"></i> Copied!');
+                setTimeout(function () {
+                    $("#copy-html").html(originalText);
+                }, 2000);
+            });
+
+            // Add placeholder styling
+            $("<style>")
+                .prop("type", "text/css")
+                .html(`
+                            .job-item-placeholder {
+                                border: 2px dashed #aaa;
+                                background-color: #f9f9f9 !important;
+                                height: 60px;
+                                margin-bottom: 15px;
+                                border-radius: 8px;
+                            }
+                            .job-item {
+                                transition: background-color 0.2s;
+                            }
+                            .job-item:hover {
+                                background-color: #f5f9ff !important;
+                            }
+                            .drag-handle {
+                                cursor: grab;
+                            }
+                            .drag-handle:active {
+                                cursor: grabbing;
+                            }
+                        `)
+                .appendTo("head");
+        });
+    </script>
+}

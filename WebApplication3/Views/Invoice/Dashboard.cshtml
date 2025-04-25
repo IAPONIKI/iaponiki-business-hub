@@ -1,0 +1,187 @@
+﻿@{
+    ViewData["Title"] = "Invoice Dashboard";
+}
+
+<div class="container mt-4">
+    <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+            <h2><i class="fas fa-tachometer-alt"></i> Invoice Dashboard</h2>
+        </div>
+        <div class="card-body">
+            <!-- Summary Cards -->
+            <div class="row">
+                <div class="col-md-3 mb-4">
+                    <div class="card border-left-secondary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
+                                        Pending Payments
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.PendingCount</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Matched Payments
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.MatchedCount</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-check fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                        Resolved Payments
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.ResolvedCount</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-flag-checkered fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                        Disputed Payments
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.DisputedCount</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Summary -->
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="m-0 font-weight-bold">Financial Summary</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="text-center">
+                                        <h4>Pending Amount</h4>
+                                        <h2 class="text-danger">€@ViewBag.PendingAmount.ToString("N2")</h2>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="text-center">
+                                        <h4>Added Today</h4>
+                                        <h2 class="text-info">@ViewBag.TodayCount</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="m-0 font-weight-bold">Quick Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-md-4 mb-3">
+                                    <a href="@Url.Action("Index", "Invoice")" class="btn btn-primary btn-block">
+                                        <i class="fas fa-search mb-2"></i><br>
+                                        Fetch Invoices
+                                    </a>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <a href="@Url.Action("PendingPayments", "Invoice")" class="btn btn-secondary btn-block">
+                                        <i class="fas fa-list mb-2"></i><br>
+                                        View Pending
+                                    </a>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <a href="@Url.Action("DownloadPendingInvoices", "Invoice")" class="btn btn-success btn-block">
+                                        <i class="fas fa-file-excel mb-2"></i><br>
+                                        Export Excel
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="m-0 font-weight-bold">What to do next</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <div class="card bg-light shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-upload text-primary"></i> Upload Excel for Comparison
+                            </h5>
+                            <p class="card-text">
+                                Upload an Excel file to compare with pending payments. This will automatically mark
+                                matching payments as "Matched".
+                            </p>
+                            <a href="@Url.Action("Index", "Invoice")" class="btn btn-primary">
+                                Go to Upload
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="card bg-light shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-download text-success"></i> Download Pending Payments
+                            </h5>
+                            <p class="card-text">
+                                Export all pending payments to an Excel file for further processing or
+                                reconciliation.
+                            </p>
+                            <a href="@Url.Action("DownloadPendingInvoices", "Invoice")" class="btn btn-success">
+                                Download Excel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

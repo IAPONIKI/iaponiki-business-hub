@@ -1,0 +1,668 @@
+@model WebApplication3.Models.CarouselModel
+
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Enter Image URLs</h2>
+
+    <form asp-action="GenerateHtml" method="post" class="p-4 bg-light rounded shadow-sm">
+        @if (Model.NeedsSeminario)
+        {
+            <h3 class="text-primary">Σεμινάριο Images</h3>
+            <div class="image-container" id="seminario-container">
+                @for (int i = 0; i < Model.SeminarioImageCount; i++)
+                {
+                    <div class="mb-4 image-item" draggable="true" data-index="@i" data-type="seminario">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span>Image @i</span>
+                                <div class="drag-handle"><i class="fas fa-grip-lines"></i></div>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">URL:</label>
+                                    <input type="text" name="SeminarioImages[@i].Url" class="form-control" />
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="SeminarioImages[@i].KeepDefault" value="true" />
+                                    <label class="form-check-label">Keep the previous image for this position?</label>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Select from old images:</label>
+                                    <select class="form-select" name="SeminarioImages[@i].OldImageSelection">
+                                        <option value=""> -- None -- </option>
+                                        @if (Model.OldSeminarioImages != null)
+                                        {
+                                            foreach (var oldImg in Model.OldSeminarioImages)
+                                            {
+                                                <option value="@oldImg.ImageId" data-url="@oldImg.Url">
+                                                    @($"{oldImg.ImageId} - {oldImg.Url}")
+                                                </option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Image ID (optional):</label>
+                                    <input class="form-control" type="text" name="SeminarioImages[@i].ImageId" />
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="SeminarioImages[@i].IncludePostMessage" value="true" />
+                                    <label class="form-check-label">Include postMessage logic for this image?</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        @if (Model.NeedsEnergeiesTouMina)
+        {
+            <h3 class="text-primary">Ενέργειες του Μήνα Images</h3>
+            <div class="image-container" id="energeies-container">
+                @for (int i = 0; i < Model.EnergeiesTouMinaImageCount; i++)
+                {
+                    <div class="mb-4 image-item" draggable="true" data-index="@i" data-type="energeies">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span>Image @i</span>
+                                <div class="drag-handle"><i class="fas fa-grip-lines"></i></div>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">URL:</label>
+                                    <input type="text" name="EnergeiesImages[@i].Url" class="form-control" />
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="EnergeiesImages[@i].KeepDefault" value="true" />
+                                    <label class="form-check-label">Keep the previous image for this position?</label>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Select from old images:</label>
+                                    <select class="form-select" name="EnergeiesImages[@i].OldImageSelection">
+                                        <option value=""> -- None -- </option>
+                                        @if (Model.OldEnergeiesImages != null)
+                                        {
+                                            foreach (var oldImg in Model.OldEnergeiesImages)
+                                            {
+                                                <option value="@oldImg.ImageId" data-url="@oldImg.Url">
+                                                    @($"{oldImg.ImageId} - {oldImg.Url}")
+                                                </option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Image ID (optional):</label>
+                                    <input class="form-control" type="text" name="EnergeiesImages[@i].ImageId" />
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="EnergeiesImages[@i].IncludePostMessage" value="true" />
+                                    <label class="form-check-label">Include postMessage logic for this image?</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        @if (Model.NeedsProsforesExoplismou)
+        {
+            <h3 class="text-primary">Προσφορές Εξοπλισμού Συνεργείου</h3>
+            <div class="image-container" id="prosfores-container">
+                @for (int i = 0; i < Model.ProsforesExoplismouImageCount; i++)
+                {
+                    <div class="mb-4 image-item" draggable="true" data-index="@i" data-type="prosfores">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span>Image @i</span>
+                                <div class="drag-handle"><i class="fas fa-grip-lines"></i></div>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">URL:</label>
+                                    <input type="text" name="ProsforesImages[@i].Url" class="form-control" />
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="ProsforesImages[@i].KeepDefault" value="true" />
+                                    <label class="form-check-label">Keep the previous image for this position?</label>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Select from old images:</label>
+                                    <select class="form-select" name="ProsforesImages[@i].OldImageSelection">
+                                        <option value=""> -- None -- </option>
+                                        @if (Model.OldProsforesImages != null)
+                                        {
+                                            foreach (var oldImg in Model.OldProsforesImages)
+                                            {
+                                                <option value="@oldImg.ImageId" data-url="@oldImg.Url">
+                                                    @($"{oldImg.ImageId} - {oldImg.Url}")
+                                                </option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Image ID (optional):</label>
+                                    <input class="form-control" type="text" name="ProsforesImages[@i].ImageId" />
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="ProsforesImages[@i].IncludePostMessage" value="true" />
+                                    <label class="form-check-label">Include postMessage logic for this image?</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <!-- Preserve booleans and counts in hidden fields again -->
+        <input type="hidden" asp-for="NeedsSeminario" />
+        <input type="hidden" asp-for="NeedsEnergeiesTouMina" />
+        <input type="hidden" asp-for="NeedsProsforesExoplismou" />
+        <input type="hidden" asp-for="SeminarioImageCount" />
+        <input type="hidden" asp-for="EnergeiesTouMinaImageCount" />
+        <input type="hidden" asp-for="ProsforesExoplismouImageCount" />
+
+        @if (Model.OldSeminarioImages != null)
+        {
+            for (int i = 0; i < Model.OldSeminarioImages.Count; i++)
+            {
+                @* If you need to preserve them between posts, store them in hidden fields *@
+                <input type="hidden" name="OldSeminarioImages[@i].ImageId" value="@Model.OldSeminarioImages[i].ImageId" />
+                <input type="hidden" name="OldSeminarioImages[@i].Url" value="@Model.OldSeminarioImages[i].Url" />
+            }
+        }
+
+        @if (Model.OldEnergeiesImages != null)
+        {
+            for (int i = 0; i < Model.OldEnergeiesImages.Count; i++)
+            {
+                @* If you need to preserve them between posts, store them in hidden fields *@
+                <input type="hidden" name="OldEnergeiesImages[@i].ImageId" value="@Model.OldEnergeiesImages[i].ImageId" />
+                <input type="hidden" name="OldEnergeiesImages[@i].Url" value="@Model.OldEnergeiesImages[i].Url" />
+            }
+        }
+
+        @if (Model.OldProsforesImages != null)
+        {
+            for (int i = 0; i < Model.OldProsforesImages.Count; i++)
+            {
+                @* If you need to preserve them between posts, store them in hidden fields *@
+                <input type="hidden" name="OldProsforesImages[@i].ImageId" value="@Model.OldProsforesImages[i].ImageId" />
+                <input type="hidden" name="OldProsforesImages[@i].Url" value="@Model.OldProsforesImages[i].Url" />
+            }
+        }
+
+        <div class="d-flex justify-content-center mt-4">
+            <button type="submit" class="btn btn-primary px-5">Generate HTML</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+
+        function setupMutuallyExclusiveInputs() {
+    // Find all URL inputs and their corresponding old image selects
+    document.querySelectorAll('input[name$="].Url"]').forEach(urlInput => {
+        const container = urlInput.closest('.card-body, .mb-4');
+        if (!container) return;
+        
+        const oldImageSelect = container.querySelector('select[name$="].OldImageSelection"]');
+        const keepDefaultCheckbox = container.querySelector('input[name$="].KeepDefault"]');
+        
+        if (!oldImageSelect || !keepDefaultCheckbox) return;
+        
+        // When URL is entered, disable the old image selection unless "Keep Default" is checked
+        urlInput.addEventListener('input', function() {
+            if (this.value.trim()) {
+                oldImageSelect.disabled = !keepDefaultCheckbox.checked;
+                if (!keepDefaultCheckbox.checked) {
+                    oldImageSelect.value = '';
+                }
+            } else {
+                oldImageSelect.disabled = false;
+            }
+        });
+        
+        // When old image is selected, disable the URL input if "Keep Default" is checked
+        oldImageSelect.addEventListener('change', function() {
+            if (this.value && keepDefaultCheckbox.checked) {
+                urlInput.disabled = true;
+                urlInput.value = '';
+            } else {
+                urlInput.disabled = false;
+            }
+        });
+        
+        // When "Keep Default" is toggled, control the state of both inputs
+        keepDefaultCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                // If keeping default image, URL should be disabled and old image enabled
+                if (oldImageSelect.value) {
+                    urlInput.disabled = true;
+                    urlInput.value = '';
+                }
+            } else {
+                // If not keeping default, both inputs can be used but the old image selection is cleared
+                urlInput.disabled = false;
+                oldImageSelect.value = '';
+            }
+        });
+        
+        // Initial state setup
+        if (keepDefaultCheckbox.checked && oldImageSelect.value) {
+            urlInput.disabled = true;
+        }
+    });
+}
+        // Function to validate URLs and show image previews
+        function setupImagePreviews() {
+            // Find all image URL input fields
+            const imageUrlInputs = document.querySelectorAll('input[name$="].Url"]');
+
+            imageUrlInputs.forEach(input => {
+                // Get or create preview container
+                let previewContainer = input.parentNode.querySelector('.image-preview-container');
+
+                if (!previewContainer) {
+                    // Create a new preview element if none exists
+                    previewContainer = document.createElement('div');
+                    previewContainer.className = 'mt-2 image-preview-container';
+                    previewContainer.innerHTML = '<div class="image-preview d-none"><img src="" class="img-thumbnail" style="max-height: 150px;" /><div class="small text-muted mt-1">Preview</div></div>';
+                    input.parentNode.appendChild(previewContainer);
+                }
+
+                const previewDiv = previewContainer.querySelector('.image-preview');
+                const previewImg = previewDiv.querySelector('img');
+
+                // Add event listeners to update preview on input change
+                input.addEventListener('input', function () {
+                    updatePreviewFromUrl(this.value, previewImg, previewDiv, input);
+                });
+
+                // If there's an initial value, try to load it
+                if (input.value) {
+                    input.dispatchEvent(new Event('input'));
+                }
+            });
+
+            // Now setup the old image selection dropdowns to show previews
+            setupOldImageSelectionPreviews();
+        }
+
+        // Function to update preview from a URL
+        function updatePreviewFromUrl(url, previewImg, previewDiv, inputElement) {
+            url = url.trim();
+            if (url) {
+                if (isValidUrl(url)) {
+                    // Add cache-busting parameter to the URL
+                    const cacheBuster = `?cache=${new Date().getTime()}`;
+                    const urlWithCacheBuster = url.includes('?') ?
+                        `${url}&_=${new Date().getTime()}` :
+                        `${url}${cacheBuster}`;
+
+                    previewImg.src = urlWithCacheBuster;
+
+                    previewImg.onload = function () {
+                        previewDiv.classList.remove('d-none');
+                        removeErrorMessage(inputElement);
+                    };
+
+                    previewImg.onerror = function () {
+                        previewDiv.classList.add('d-none');
+                        showErrorMessage(inputElement, 'Invalid image URL or image cannot be loaded');
+                    };
+                } else {
+                    previewDiv.classList.add('d-none');
+                    showErrorMessage(inputElement, 'Invalid URL format');
+                }
+            } else {
+                previewDiv.classList.add('d-none');
+                removeErrorMessage(inputElement);
+            }
+        }
+
+        // Function to handle previews when selecting from old images
+        function setupOldImageSelectionPreviews() {
+            const oldImageSelects = document.querySelectorAll('select[name$="].OldImageSelection"]');
+
+            oldImageSelects.forEach(select => {
+                // Create a preview container if it doesn't exist
+                let previewContainer = select.parentNode.querySelector('.old-image-preview-container');
+                if (!previewContainer) {
+                    previewContainer = document.createElement('div');
+                    previewContainer.className = 'mt-2 old-image-preview-container';
+                    previewContainer.innerHTML = '<div class="old-image-preview d-none"><img src="" class="img-thumbnail" style="max-height: 150px;" /><div class="small text-muted mt-1">Old Image Preview</div></div>';
+                    select.parentNode.appendChild(previewContainer);
+                }
+
+                const previewDiv = previewContainer.querySelector('.old-image-preview');
+                const previewImg = previewDiv.querySelector('img');
+
+                // Find the associated Keep Default checkbox
+                const keepDefaultCheckbox = select.closest('.card-body, .mb-4').querySelector('input[name$="].KeepDefault"]');
+
+                // Find the associated URL input
+                const urlInput = select.closest('.card-body, .mb-4').querySelector('input[name$="].Url"]');
+
+                // Handle selection changes
+                select.addEventListener('change', function () {
+                    const selectedOption = this.options[this.selectedIndex];
+                    if (selectedOption && selectedOption.value) {
+                        // Extract the URL from the option text (which is in format "ID - URL")
+                        const optionText = selectedOption.text;
+                        const urlMatch = optionText.match(/- (.+)$/);
+                        if (urlMatch && urlMatch[1]) {
+                            const url = urlMatch[1].trim();
+
+                            // Add cache-busting parameter
+                            const cacheBuster = `?cache=${new Date().getTime()}`;
+                            const urlWithCacheBuster = url.includes('?') ?
+                                `${url}&_=${new Date().getTime()}` :
+                                `${url}${cacheBuster}`;
+
+                            previewImg.src = urlWithCacheBuster;
+                            previewImg.onload = function () {
+                                previewDiv.classList.remove('d-none');
+                            };
+                            previewImg.onerror = function () {
+                                previewDiv.classList.add('d-none');
+                            };
+
+                            // If Keep Default is checked, update the URL input value
+                            if (keepDefaultCheckbox && keepDefaultCheckbox.checked && urlInput) {
+                                urlInput.value = url;
+                                // Also update the main preview
+                                const mainPreviewContainer = urlInput.parentNode.querySelector('.image-preview-container');
+                                if (mainPreviewContainer) {
+                                    const mainPreviewDiv = mainPreviewContainer.querySelector('.image-preview');
+                                    const mainPreviewImg = mainPreviewDiv.querySelector('img');
+                                    updatePreviewFromUrl(url, mainPreviewImg, mainPreviewDiv, urlInput);
+                                }
+                            }
+                        }
+                    } else {
+                        previewDiv.classList.add('d-none');
+                    }
+                });
+
+                // Also handle the Keep Default checkbox change
+                if (keepDefaultCheckbox) {
+                    keepDefaultCheckbox.addEventListener('change', function () {
+                        if (this.checked && select.value) {
+                            // Trigger the select change event to update previews
+                            select.dispatchEvent(new Event('change'));
+                        }
+                    });
+                }
+
+                // Check if there's an initial selection
+                if (select.value) {
+                    select.dispatchEvent(new Event('change'));
+                }
+            });
+        }
+
+        function updatePreview(input, previewImg, previewDiv) {
+            const url = input.value.trim();
+            if (url) {
+                // Validate URL format
+                if (isValidUrl(url)) {
+                    previewImg.src = url;
+                    previewImg.onload = function () {
+                        if (previewDiv) previewDiv.classList.remove('d-none');
+                    };
+                    previewImg.onerror = function () {
+                        if (previewDiv) previewDiv.classList.add('d-none');
+                        showErrorMessage(input, 'Invalid image URL or image cannot be loaded');
+                    };
+                } else {
+                    if (previewDiv) previewDiv.classList.add('d-none');
+                    showErrorMessage(input, 'Invalid URL format');
+                }
+            } else {
+                if (previewDiv) previewDiv.classList.add('d-none');
+                removeErrorMessage(input);
+            }
+        }
+
+        // Show error message under an input
+        function showErrorMessage(input, message) {
+            removeErrorMessage(input);
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'text-danger url-error-message mt-1';
+            errorDiv.textContent = message;
+            input.parentNode.appendChild(errorDiv);
+        }
+
+        // Remove error message from an input
+        function removeErrorMessage(input) {
+            const errorMessage = input.parentNode.querySelector('.url-error-message');
+            if (errorMessage) {
+                errorMessage.remove();
+            }
+        }
+
+        // Validate URL format
+        function isValidUrl(url) {
+            try {
+                new URL(url);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', setupImagePreviews);
+
+
+        // Add this to your Scripts section
+        function setupDragAndDrop() {
+            const containers = document.querySelectorAll('.image-container');
+
+            containers.forEach(container => {
+                const items = container.querySelectorAll('.image-item');
+
+                items.forEach(item => {
+                    // Set up drag events
+                    item.addEventListener('dragstart', handleDragStart);
+                    item.addEventListener('dragover', handleDragOver);
+                    item.addEventListener('dragenter', handleDragEnter);
+                    item.addEventListener('dragleave', handleDragLeave);
+                    item.addEventListener('drop', handleDrop);
+                    item.addEventListener('dragend', handleDragEnd);
+                });
+            });
+        }
+
+        let draggedItem = null;
+
+        function handleDragStart(e) {
+            draggedItem = this;
+            this.style.opacity = '0.4';
+
+            // For Firefox compatibility
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.outerHTML);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+
+        function handleDragEnter(e) {
+            this.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.stopPropagation();
+            e.preventDefault();
+
+            // Don't do anything if dropping the same item we're dragging
+            if (draggedItem !== this) {
+                // Get the type and container of the dragged item
+                const type = draggedItem.getAttribute('data-type');
+                const container = document.getElementById(type + '-container');
+
+                // Get positions
+                const allItems = Array.from(container.querySelectorAll('.image-item'));
+                const draggedIndex = allItems.indexOf(draggedItem);
+                const droppedIndex = allItems.indexOf(this);
+
+                // Reorder items in the DOM
+                if (draggedIndex < droppedIndex) {
+                    this.parentNode.insertBefore(draggedItem, this.nextSibling);
+                } else {
+                    this.parentNode.insertBefore(draggedItem, this);
+                }
+
+                // Update all form field names to match the new order
+                updateFormFieldIndexes(container);
+            }
+
+            return false;
+        }
+
+        function handleDragEnd(e) {
+            // Remove drag styling
+            this.style.opacity = '1';
+
+            const items = document.querySelectorAll('.image-item');
+            items.forEach(item => {
+                item.classList.remove('drag-over');
+            });
+        }
+
+        function updateFormFieldIndexes(container) {
+            const items = container.querySelectorAll('.image-item');
+            const type = container.id.replace('-container', '');
+
+            // Capitalize first letter for field name
+            const fieldPrefix = type.charAt(0).toUpperCase() + type.slice(1);
+
+            items.forEach((item, newIndex) => {
+                // Update the data-index attribute
+                item.setAttribute('data-index', newIndex);
+
+                // Update all form fields within this item
+                const inputs = item.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    const name = input.getAttribute('name');
+                    if (name) {
+                        // Extract the old index using regex
+                        const regex = new RegExp(`${fieldPrefix}Images\\[(\\d+)\\]`);
+                        const match = name.match(regex);
+
+                        if (match) {
+                            // Replace the old index with the new index
+                            const newName = name.replace(regex, `${fieldPrefix}Images[${newIndex}]`);
+                            input.setAttribute('name', newName);
+                        }
+                    }
+                });
+
+                // Update the header text
+                const header = item.querySelector('.card-header span');
+                if (header) {
+                    header.textContent = `Image ${newIndex}`;
+                }
+            });
+        }
+        function cleanupExistingPreviews() {
+            // Find standalone preview elements that are not in containers
+            const standalonePreviewElements = document.querySelectorAll('body > .preview, form > .preview');
+            standalonePreviewElements.forEach(element => {
+                if (element.tagName === 'DIV' && element.textContent.trim() === 'Preview') {
+                    element.remove();
+                }
+            });
+
+            // Remove duplicate preview images that appear at the bottom of the page
+            const previewImages = document.querySelectorAll('img.img-thumbnail');
+            let seenUrls = new Set();
+
+            previewImages.forEach(img => {
+                const src = img.getAttribute('src');
+                // If we're outside of a proper container, or this is a duplicate
+                const isInProperContainer = img.closest('.image-preview-container, .old-image-preview-container');
+
+                if (!isInProperContainer || (src && seenUrls.has(src))) {
+                    // Find the parent container and remove it if it's a standalone preview
+                    const previewElement = img.closest('.preview');
+                    if (previewElement) {
+                        previewElement.remove();
+                    }
+                }
+
+                if (src) {
+                    seenUrls.add(src);
+                }
+            });
+        }
+
+        function cleanupBottomPreviews() {
+            // Specifically target preview elements at the end of the form
+            const form = document.querySelector('form');
+            if (form) {
+                // Get all direct children of the form
+                Array.from(form.children).forEach(child => {
+                    // If this is a div containing text "Preview", remove it
+                    if (child.tagName === 'DIV' &&
+                        child.textContent.trim() === 'Preview' &&
+                        !child.closest('.card')) {
+                        child.remove();
+                    }
+
+                    // If this is an image or a div containing just an image, remove it
+                    if ((child.tagName === 'IMG') ||
+                        (child.tagName === 'DIV' &&
+                            child.children.length === 1 &&
+                            child.children[0].tagName === 'IMG' &&
+                            !child.closest('.card'))) {
+                        child.remove();
+                    }
+                });
+            }
+        }
+
+        // Call this function before setting up your other functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            cleanupBottomPreviews();
+            setupImagePreviews();
+            setupDragAndDrop();
+            setupBatchOperations();
+        });
+
+        function setupBatchOperations() {
+            // We'll add batch operations functionality later
+            console.log("Batch operations will be added later");
+        }
+
+        // Single unified DOM content loaded handler
+        document.addEventListener('DOMContentLoaded', function () {
+
+            setupMutuallyExclusiveInputs();
+
+            // Clean up any stray preview elements first
+            cleanupExistingPreviews();
+            cleanupBottomPreviews();
+
+            // Then set up our functionality
+            setupImagePreviews();
+            setupDragAndDrop();
+            setupBatchOperations();
+
+        });
+    </script>
+}

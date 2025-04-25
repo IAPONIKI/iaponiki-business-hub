@@ -1,0 +1,23 @@
+﻿@model string
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Your Generated HTML</h2>
+
+    <!-- Display the HTML in a styled textarea -->
+    <div class="mb-4">
+        <label for="htmlOutput" class="form-label">Generated HTML Code:</label>
+        <textarea id="htmlOutput" class="form-control" rows="15">@Model</textarea>
+    </div>
+
+    <!-- Hidden form for downloading the HTML file -->
+    <form asp-action="DownloadHtml" method="post" class="mb-4">
+        <input type="hidden" name="finalHtml" value="@Model" />
+        <button type="submit" class="btn btn-primary w-100">Download as .html</button>
+    </form>
+
+    <!-- Preview the HTML -->
+    <h3 class="text-center mb-3">Preview</h3>
+    <div class="border rounded bg-light shadow-sm" style="height: 600px; overflow: hidden;">
+        <iframe srcdoc="@Model" class="w-100 h-100 border-0"></iframe>
+    </div>
+</div>
